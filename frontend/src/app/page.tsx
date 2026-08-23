@@ -1,12 +1,10 @@
 
 const Home = () => {
   return (
-    <div>
+    <div className="bg-red-500">
       Hello world!
 
-
-      my ecommerce project 
-    </div> 
+    </div>  
   )
 }
 
