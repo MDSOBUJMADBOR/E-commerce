@@ -5,8 +5,8 @@ const Home = () => {
       Hello world!
 
 
-      Bangladesh
-    </div>
+      my ecommerce project 
+    </div> 
   )
 }
 
