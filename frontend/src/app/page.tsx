@@ -3,7 +3,10 @@ const Home = () => {
   return (
     <div>
       Hello world!
-    </div>
+
+
+      my ecommerce project 
+    </div> 
   )
 }
 
