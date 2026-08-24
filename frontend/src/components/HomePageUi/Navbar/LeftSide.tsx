@@ -13,7 +13,7 @@ export default function LeftSide() {
           priority
         />
 
-        <h2 className="text-3xl font-bold tracking-tight text-green-600 sm:text-4xl">
+        <h2 className="italic text-3xl font-bold tracking-tight text-green-600 sm:text-4xl">
           ShopEasy
         </h2>
       </div>

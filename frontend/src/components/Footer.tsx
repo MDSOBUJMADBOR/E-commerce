@@ -1,9 +1,11 @@
-import React from 'react';
+import FooterSection from "./HomePageUi/Footer/FooterSection";
+
 
 const Footer = () => {
     return (
         <div>
-            Footer page 
+          <FooterSection />
+
         </div>
     );
 };
