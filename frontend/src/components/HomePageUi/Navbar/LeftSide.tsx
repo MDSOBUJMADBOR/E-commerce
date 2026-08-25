@@ -13,8 +13,8 @@ export default function LeftSide() {
           priority
         />
 
-        <h2 className="italic text-3xl font-bold tracking-tight text-green-600 sm:text-4xl">
-          ShopEasy
+        <h2 className="italic text-2xl lg:text-3xl  xl:text-4xl font-bold  text-green-600 ">
+         ‍<span className="text-black">Shop</span>Easy
         </h2>
       </div>
     </Link>
