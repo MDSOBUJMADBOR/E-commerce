@@ -1,8 +1,10 @@
+import NewsletterSection from "@/components/HomePageUi/NewsletterSection"
 
 const Home = () => {
   return (
-    <div className="">
-      Hello world!
+    <div>
+    <NewsletterSection />
+
 
     </div>  
   )
