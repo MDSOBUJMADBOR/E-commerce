@@ -62,7 +62,7 @@ const Navbar = () => {
       {/* DESKTOP NAVBAR */}
       {/* ================================================= */}
 
-      <nav className="mx-auto hidden max-w-7xl items-center justify-between gap-6 px-6 py-4 md:flex">
+      <nav className="mx-auto hidden max-w-full items-center justify-between gap-6 px-10 py-4 md:flex bg-gray-100">
         {/* Left */}
         <LeftSide />
 
