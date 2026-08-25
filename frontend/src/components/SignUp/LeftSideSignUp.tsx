@@ -9,7 +9,7 @@ import {
 
 const LeftSideSignUp = () => {
   return (
-    <div className="w-full lg:w-1/2 min-h-full overflow-hidden bg-[#004d3c] text-white flex flex-col justify-between relative p-6 sm:p-8 lg:p-12">
+    <div className="w-full lg:w-1/2 min-h-full overflow-hidden bg-[#004d3c] text-white flex flex-col justify-between relative p-6 sm:p-8 lg:p-12 ">
       {/* Background Glow Circles */}
       <div className="pointer-events-none absolute -right-32 -top-32 h-[420px] w-[420px] rounded-full border border-emerald-400/10" />
       <div className="pointer-events-none absolute -right-20 -top-20 h-[330px] w-[330px] rounded-full border border-emerald-400/10" />
