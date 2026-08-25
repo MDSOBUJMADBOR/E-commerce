@@ -30,7 +30,7 @@ export default function Middle() {
   };
 
   return (
-    <div className="flex w-full max-w-xl items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 shadow-sm transition focus-within:border-green-500 focus-within:bg-white focus-within:shadow-md">
+    <div className="flex  items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 shadow-sm transition focus-within:border-green-500 focus-within:bg-white focus-within:shadow-md">
       
       {/* Search Icon */}
       <Search className="h-5 w-5 shrink-0 text-gray-500" />
