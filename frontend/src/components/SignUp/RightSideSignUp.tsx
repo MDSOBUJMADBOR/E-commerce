@@ -9,7 +9,7 @@ interface FormData {
   email: string;
   password: string;
   confirmPassword: string;
-  agreeTerms: boolean;
+  agreeTerms: boolean; 
 }
 
 interface FormErrors {
