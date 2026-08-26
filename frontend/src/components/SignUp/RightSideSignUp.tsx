@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -9,7 +8,7 @@ interface FormData {
   email: string;
   password: string;
   confirmPassword: string;
-  agreeTerms: boolean; 
+  agreeTerms: boolean;
 }
 
 interface FormErrors {
@@ -35,55 +34,92 @@ const RightSideSignUp = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
+  // =========================================================
+  // HANDLE INPUT CHANGE
+  // =========================================================
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
+
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
 
     if (errors[name as keyof FormErrors]) {
-      setErrors((prev) => ({ ...prev, [name]: undefined }));
+      setErrors((prev) => ({
+        ...prev,
+        [name]: undefined,
+      }));
     }
   };
 
+  // =========================================================
+  // VALIDATION
+  // =========================================================
+
   const validate = (): boolean => {
     const newErrors: FormErrors = {};
-    if (!formData.fullName.trim()) newErrors.fullName = "Full name is required";
+
+    if (!formData.fullName.trim()) {
+      newErrors.fullName = "Full name is required";
+    }
+
     if (!formData.email.trim()) {
       newErrors.email = "Email address is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Please enter a valid email address";
     }
+
     if (!formData.password) {
       newErrors.password = "Password is required";
     } else if (formData.password.length < 8) {
       newErrors.password = "Password must be at least 8 characters";
     }
+
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = "Please confirm your password";
     } else if (formData.confirmPassword !== formData.password) {
       newErrors.confirmPassword = "Passwords do not match";
     }
+
     if (!formData.agreeTerms) {
-      newErrors.agreeTerms = "You must agree to the Terms & Conditions";
+      newErrors.agreeTerms =
+        "You must agree to the Terms & Conditions";
     }
 
     setErrors(newErrors);
+
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // =========================================================
+  // CREATE ACCOUNT
+  // =========================================================
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     if (!validate()) return;
 
     setIsSubmitting(true);
 
-    // Form data Console Log
-    console.log("Form Submitted Data:", formData);
+    // Console form data
+    console.log("=================================");
+    console.log("       CREATE ACCOUNT DATA        ");
+    console.log("=================================");
+    console.log("Full Name:", formData.fullName);
+    console.log("Email:", formData.email);
+    console.log("Password:", formData.password);
+    console.log("Confirm Password:", formData.confirmPassword);
+    console.log("Agree Terms:", formData.agreeTerms);
+    console.log("=================================");
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Fake API delay
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+
+      // Show success screen
       setIsSuccess(true);
     } catch (error) {
       console.error("Submission error:", error);
@@ -92,149 +128,283 @@ const RightSideSignUp = () => {
     }
   };
 
-  // Social Sign-up Handlers
+  // =========================================================
+  // SOCIAL SIGN UP
+  // =========================================================
+
   const googleSignUp = () => {
-    alert("google");
+    alert("Google Sign Up clicked");
   };
 
   const facebookSignUp = () => {
-    alert("facebook");
+    alert("Facebook Sign Up clicked");
   };
 
   const appleSignUp = () => {
-    alert("apple");
+    alert("Apple Sign Up clicked");
   };
 
-  return (
-    <div className="w-full lg:w-1/2 bg-white px-5 py-6 min-h-full sm:px-8 lg:px-10 flex flex-col justify-center items-center">
-      <div className="w-full ">
-        
-        {/* Header Icon & Title */}
-        <div className="mb-5 text-center flex flex-col items-center">
-          <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-[#00a651]">
-            <UserPlusBigIcon />
-          </div>
+  // =========================================================
+  // MAIN UI
+  // =========================================================
 
-          <h2 className="text-2xl font-bold text-[#26364a]">
-            Create Your Account
-          </h2>
-          <p className="mt-1 text-xs sm:text-sm text-[#64748b]">
-            Join <span className="font-semibold text-[#00a651]">ShopEasy</span> and start shopping today!
-          </p>
-        </div>
+  return (
+    <div className="relative flex min-h-full w-full items-center justify-center overflow-hidden bg-white px-5 py-6 sm:px-8 lg:w-1/2 lg:px-10">
+
+      {/* =====================================================
+          BACKGROUND DECORATION
+      ===================================================== */}
+
+      <div className="pointer-events-none absolute -bottom-32 -right-32 h-72 w-72 rounded-full border border-[#00a957]/10" />
+
+      <div className="pointer-events-none absolute -bottom-20 -right-20 h-52 w-52 rounded-full border border-[#00a957]/10" />
+
+      <div className="pointer-events-none absolute -bottom-8 -right-8 h-32 w-32 rounded-full border border-[#00a957]/10" />
+
+      <div className="pointer-events-none absolute -left-20 -top-20 h-44 w-44 rounded-full border border-[#00a957]/5" />
+
+      {/* =====================================================
+          MAIN CONTENT
+      ===================================================== */}
+
+      <div className="relative z-10 w-full">
+
+        {/* ===================================================
+            SUCCESS UI
+        =================================================== */}
 
         {isSuccess ? (
-          <div className="py-10 text-center">
-            <h3 className="text-xl font-bold text-[#26364a]">Account Created!</h3>
-            <p className="mt-2 text-sm text-gray-500">Welcome to ShopEasy.</p>
-            <Link href="/">
-              <button className="mt-6 font-semibold text-[#00a651] cursor-pointer">← Back to Home</button>
-            </Link>
-          </div>
+          <SuccessScreen
+            fullName={formData.fullName}
+            email={formData.email}
+          />
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-3 ">
-            {/* Full Name */}
-            <InputField
-              label="Full Name"
-              name="fullName"
-              type="text"
-              value={formData.fullName}
-              onChange={handleChange}
-              placeholder="Enter your full name"
-              error={errors.fullName}
-              icon={<UserIcon />}
-            />
+          <>
+            {/* =================================================
+                HEADER
+            ================================================= */}
 
-            {/* Email */}
-            <InputField
-              label="Email Address"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Enter your email address"
-              error={errors.email}
-              icon={<MailIcon />}
-            />
+            <div className="mb-5 flex flex-col items-center text-center">
 
-            {/* Password */}
-            <PasswordField
-              label="Password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter your password"
-              showPassword={showPassword}
-              setShowPassword={setShowPassword}
-              error={errors.password}
-            />
-
-            {/* Confirm Password */}
-            <PasswordField
-              label="Confirm Password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              placeholder="Confirm your password"
-              showPassword={showConfirmPassword}
-              setShowPassword={setShowConfirmPassword}
-              error={errors.confirmPassword}
-            />
-
-            {/* Terms */}
-            <div className="pt-1">
-              <div className="flex items-center gap-2">
-                <input
-                  id="agreeTerms"
-                  name="agreeTerms"
-                  type="checkbox"
-                  checked={formData.agreeTerms}
-                  onChange={handleChange}
-                  className="h-4 w-4 rounded border-gray-300 text-[#00a651] focus:ring-[#00a651]"
-                />
-                <label htmlFor="agreeTerms" className="text-xs text-[#64748b]">
-                  I agree to the{" "}
-                  <Link href="/terms" className="font-semibold text-[#00a651]">Terms & Conditions</Link>{" "}
-                  and{" "}
-                  <Link href="/privacy" className="font-semibold text-[#00a651]">Privacy Policy</Link>
-                </label>
+              {/* Icon */}
+              <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-[#00a651]">
+                <UserPlusBigIcon />
               </div>
-              {errors.agreeTerms && <p className="mt-1 text-xs text-red-500">{errors.agreeTerms}</p>}
+
+              {/* Title */}
+              <h2 className="text-2xl font-bold text-[#26364a]">
+                Create Your Account
+              </h2>
+
+              {/* Description */}
+              <p className="mt-1 text-xs text-[#64748b] sm:text-sm">
+                Join{" "}
+                <span className="font-semibold text-[#00a651]">
+                  ShopEasy
+                </span>{" "}
+                and start shopping today!
+              </p>
+
             </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#00a651] py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#009447]"
+            {/* =================================================
+                FORM
+            ================================================= */}
+
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-3"
             >
-              <UserPlusIcon />
-              {isSubmitting ? "Creating Account..." : "Create Account"}
-            </button>
 
-            {/* Divider */}
-            <div className="flex items-center gap-3 py-1">
-              <div className="h-px flex-1 bg-gray-200" />
-              <span className="text-xs text-[#94a3b8]">or sign up with</span>
-              <div className="h-px flex-1 bg-gray-200" />
-            </div>
+              {/* Full Name */}
+              <InputField
+                label="Full Name"
+                name="fullName"
+                type="text"
+                value={formData.fullName}
+                onChange={handleChange}
+                placeholder="Enter your full name"
+                error={errors.fullName}
+                icon={<UserIcon />}
+              />
 
-            {/* Social Buttons */}
-            <div className="grid grid-cols-3 gap-2">
-              <SocialButton onClick={googleSignUp} provider="Google" icon={<GoogleIcon />} />
-              <SocialButton onClick={facebookSignUp} provider="Facebook" icon={<FacebookIcon />} />
-              <SocialButton onClick={appleSignUp} provider="Apple" icon={<AppleIcon />} />
-            </div>
+              {/* Email */}
+              <InputField
+                label="Email Address"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Enter your email address"
+                error={errors.email}
+                icon={<MailIcon />}
+              />
 
-            {/* Sign In Link */}
-            <p className="pt-2 text-center text-xs text-[#64748b]">
-              Already have an account?{" "}
-              <Link href="/signin" className="font-semibold text-[#00a651]">
-                Sign in
-              </Link>
-            </p>
-          </form>
+              {/* Password */}
+              <PasswordField
+                label="Password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Enter your password"
+                showPassword={showPassword}
+                setShowPassword={setShowPassword}
+                error={errors.password}
+              />
+
+              {/* Confirm Password */}
+              <PasswordField
+                label="Confirm Password"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="Confirm your password"
+                showPassword={showConfirmPassword}
+                setShowPassword={setShowConfirmPassword}
+                error={errors.confirmPassword}
+              />
+
+              {/* =================================================
+                  TERMS
+              ================================================= */}
+
+              <div className="pt-1">
+
+                <div className="flex items-start gap-2">
+
+                  <input
+                    id="agreeTerms"
+                    name="agreeTerms"
+                    type="checkbox"
+                    checked={formData.agreeTerms}
+                    onChange={handleChange}
+                    className="mt-[1px] h-4 w-4 shrink-0 cursor-pointer rounded border-gray-300 accent-[#00a651] focus:ring-[#00a651]"
+                  />
+
+                  <label
+                    htmlFor="agreeTerms"
+                    className="text-xs leading-5 text-[#64748b]"
+                  >
+                    I agree to the{" "}
+                    <Link
+                      href="/terms"
+                      className="font-semibold text-[#00a651] hover:underline"
+                    >
+                      Terms & Conditions
+                    </Link>{" "}
+                    and{" "}
+                    <Link
+                      href="/privacy"
+                      className="font-semibold text-[#00a651] hover:underline"
+                    >
+                      Privacy Policy
+                    </Link>
+                  </label>
+
+                </div>
+
+                {errors.agreeTerms && (
+                  <p className="mt-1 text-[11px] text-red-500">
+                    {errors.agreeTerms}
+                  </p>
+                )}
+
+              </div>
+
+              {/* =================================================
+                  CREATE ACCOUNT BUTTON
+              ================================================= */}
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#00a651] py-2.5 text-sm font-semibold text-white shadow-sm transition duration-200 hover:bg-[#009447] hover:shadow-md active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
+              >
+
+                {isSubmitting ? (
+                  <>
+                    {/* Loading Spinner */}
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+
+                    <span>
+                      Creating Account...
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <UserPlusIcon />
+
+                    <span>
+                      Create Account
+                    </span>
+                  </>
+                )}
+
+              </button>
+
+              {/* =================================================
+                  DIVIDER
+              ================================================= */}
+
+              <div className="flex items-center gap-3 py-1">
+
+                <div className="h-px flex-1 bg-gray-200" />
+
+                <span className="whitespace-nowrap text-xs text-[#94a3b8]">
+                  or sign up with
+                </span>
+
+                <div className="h-px flex-1 bg-gray-200" />
+
+              </div>
+
+              {/* =================================================
+                  SOCIAL BUTTONS
+              ================================================= */}
+
+              <div className="grid grid-cols-3 gap-2">
+
+                <SocialButton
+                  onClick={googleSignUp}
+                  provider="Google"
+                  icon={<GoogleIcon />}
+                />
+
+                <SocialButton
+                  onClick={facebookSignUp}
+                  provider="Facebook"
+                  icon={<FacebookIcon />}
+                />
+
+                <SocialButton
+                  onClick={appleSignUp}
+                  provider="Apple"
+                  icon={<AppleIcon />}
+                />
+
+              </div>
+
+              {/* =================================================
+                  SIGN IN
+              ================================================= */}
+
+              <p className="pt-2 text-center text-xs text-[#64748b]">
+
+                Already have an account?{" "}
+
+                <Link
+                  href="/signin"
+                  className="font-semibold text-[#00a651] transition hover:text-[#008d49]"
+                >
+                  Sign in
+                </Link>
+
+              </p>
+
+            </form>
+          </>
         )}
+
       </div>
     </div>
   );
@@ -242,18 +412,254 @@ const RightSideSignUp = () => {
 
 export default RightSideSignUp;
 
-/* Helper Component Functions & SVG Icons */
 
-function InputField({ label, name, type, value, placeholder, error, icon, onChange }: any) {
+/* =========================================================
+   SUCCESS SCREEN
+========================================================= */
+
+function SuccessScreen({
+  fullName,
+  email,
+}: {
+  fullName: string;
+  email: string;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center py-6 text-center">
+
+      {/* =====================================================
+          SUCCESS ICON
+      ===================================================== */}
+
+      <div className="relative mb-6">
+
+        {/* Outer Pulse */}
+        <div className="absolute inset-0 animate-ping rounded-full bg-[#00a651]/10" />
+
+        {/* Outer Circle */}
+        <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-[#ecfdf3]">
+
+          {/* Inner Circle */}
+          <div className="flex h-[70px] w-[70px] items-center justify-center rounded-full bg-[#00a651] shadow-lg shadow-[#00a651]/25 animate-[scaleIn_0.5s_ease-out]">
+
+            {/* Check */}
+            <svg
+              className="h-10 w-10 animate-[checkDraw_0.6s_ease-out_0.3s_both]"
+              viewBox="0 0 52 52"
+              fill="none"
+            >
+              <path
+                d="M14 27L22 35L39 17"
+                stroke="white"
+                strokeWidth="5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+
+          </div>
+
+        </div>
+
+        {/* Small Decorative Dots */}
+        <span className="absolute -right-2 top-2 h-3 w-3 animate-bounce rounded-full bg-[#00a651]" />
+        <span className="absolute -bottom-1 -left-2 h-2.5 w-2.5 animate-bounce rounded-full bg-[#7dd3a7] [animation-delay:150ms]" />
+
+      </div>
+
+      {/* =====================================================
+          SUCCESS TITLE
+      ===================================================== */}
+
+      <div className="animate-[fadeUp_0.6s_ease-out_0.2s_both]">
+
+        <h2 className="text-2xl font-bold text-[#26364a] sm:text-3xl">
+          Account Created!
+        </h2>
+
+        <p className="mt-2 text-sm text-[#64748b]">
+          Welcome to{" "}
+          <span className="font-semibold text-[#00a651]">
+            ShopEasy
+          </span>
+          !
+        </p>
+
+      </div>
+
+      {/* =====================================================
+          USER INFO
+      ===================================================== */}
+
+      <div className="mt-5 w-full max-w-sm animate-[fadeUp_0.6s_ease-out_0.35s_both]">
+
+        <div className="rounded-xl border border-[#e4eee8] bg-[#f8fcfa] px-4 py-3">
+
+          <p className="text-sm font-semibold text-[#26364a]">
+            {fullName}
+          </p>
+
+          <p className="mt-1 text-xs text-[#7a8797]">
+            {email}
+          </p>
+
+        </div>
+
+      </div>
+
+      {/* =====================================================
+          MESSAGE
+      ===================================================== */}
+
+      <p className="mt-5 max-w-sm text-xs leading-5 text-[#718096] animate-[fadeUp_0.6s_ease-out_0.5s_both]">
+        Your account has been successfully created.
+        You can now explore products and enjoy shopping
+        with ShopEasy.
+      </p>
+
+      {/* =====================================================
+          BUTTONS
+      ===================================================== */}
+
+      <div className="mt-6 flex w-full max-w-sm flex-col gap-2.5 animate-[fadeUp_0.6s_ease-out_0.65s_both]">
+
+        {/* Continue Shopping */}
+        <Link
+          href="/"
+          className="flex h-11 items-center justify-center rounded-lg bg-[#00a651] text-sm font-semibold text-white shadow-sm transition duration-200 hover:bg-[#009447] hover:shadow-md active:scale-[0.98]"
+        >
+          Continue Shopping
+        </Link>
+
+        {/* Sign In */}
+        <Link
+          href="/signin"
+          className="flex h-11 items-center justify-center rounded-lg border border-[#dce5df] bg-white text-sm font-semibold text-[#00a651] transition duration-200 hover:bg-[#f5faf7] active:scale-[0.98]"
+        >
+          Go to Sign In
+        </Link>
+
+      </div>
+
+      {/* =====================================================
+          SUCCESS BADGE
+      ===================================================== */}
+
+      <div className="mt-6 flex items-center gap-2 text-[11px] text-[#7a8797] animate-[fadeUp_0.6s_ease-out_0.8s_both]">
+
+        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#e8f8ef]">
+
+          <svg
+            className="h-2.5 w-2.5 text-[#00a651]"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M16.704 5.293a1 1 0 010 1.414l-7.25 7.25a1 1 0 01-1.414 0l-3.25-3.25a1 1 0 111.414-1.414l2.543 2.543 6.543-6.543a1 1 0 011.414 0z"
+              clipRule="evenodd"
+            />
+          </svg>
+
+        </span>
+
+        Account setup completed successfully
+
+      </div>
+
+      {/* =====================================================
+          CUSTOM ANIMATION
+      ===================================================== */}
+
+      <style jsx>{`
+        @keyframes scaleIn {
+          0% {
+            transform: scale(0);
+            opacity: 0;
+          }
+
+          70% {
+            transform: scale(1.1);
+            opacity: 1;
+          }
+
+          100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+
+        @keyframes checkDraw {
+          0% {
+            stroke-dasharray: 60;
+            stroke-dashoffset: 60;
+            opacity: 0;
+          }
+
+          100% {
+            stroke-dasharray: 60;
+            stroke-dashoffset: 0;
+            opacity: 1;
+          }
+        }
+
+        @keyframes fadeUp {
+          0% {
+            opacity: 0;
+            transform: translateY(15px);
+          }
+
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
+
+    </div>
+  );
+}
+
+
+/* =========================================================
+   INPUT FIELD
+========================================================= */
+
+function InputField({
+  label,
+  name,
+  type,
+  value,
+  placeholder,
+  error,
+  icon,
+  onChange,
+}: {
+  label: string;
+  name: string;
+  type: string;
+  value: string;
+  placeholder: string;
+  error?: string;
+  icon: React.ReactNode;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}) {
   return (
     <div>
-      <label htmlFor={name} className="mb-1 block text-xs font-semibold text-[#26364a]">
+
+      <label
+        htmlFor={name}
+        className="mb-1 block text-xs font-semibold text-[#26364a]"
+      >
         {label}
       </label>
+
       <div className="relative">
+
         <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#718096]">
           {icon}
         </div>
+
         <input
           id={name}
           name={name}
@@ -261,26 +667,67 @@ function InputField({ label, name, type, value, placeholder, error, icon, onChan
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`h-9 sm:h-10 w-full rounded-lg border bg-white pl-9 pr-3 text-xs text-[#26364a] outline-none ${
-            error ? "border-red-400" : "border-[#dce2e8] focus:border-[#00a651]"
+          className={`h-9 w-full rounded-lg border bg-white pl-9 pr-3 text-xs text-[#26364a] outline-none transition sm:h-10 ${
+            error
+              ? "border-red-400 focus:border-red-500"
+              : "border-[#dce2e8] focus:border-[#00a651] focus:ring-2 focus:ring-[#00a651]/10"
           }`}
         />
+
       </div>
-      {error && <p className="mt-0.5 text-[11px] text-red-500">{error}</p>}
+
+      {error && (
+        <p className="mt-0.5 text-[11px] text-red-500">
+          {error}
+        </p>
+      )}
+
     </div>
   );
 }
 
-function PasswordField({ label, name, value, placeholder, showPassword, setShowPassword, error, onChange }: any) {
+
+/* =========================================================
+   PASSWORD FIELD
+========================================================= */
+
+function PasswordField({
+  label,
+  name,
+  value,
+  placeholder,
+  showPassword,
+  setShowPassword,
+  error,
+  onChange,
+}: {
+  label: string;
+  name: string;
+  value: string;
+  placeholder: string;
+  showPassword: boolean;
+  setShowPassword: (value: boolean) => void;
+  error?: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}) {
   return (
     <div>
-      <label htmlFor={name} className="mb-1 block text-xs font-semibold text-[#26364a]">
+
+      <label
+        htmlFor={name}
+        className="mb-1 block text-xs font-semibold text-[#26364a]"
+      >
         {label}
       </label>
+
       <div className="relative">
+
+        {/* Lock Icon */}
         <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#718096]">
           <LockIcon />
         </div>
+
+        {/* Input */}
         <input
           id={name}
           name={name}
@@ -288,22 +735,47 @@ function PasswordField({ label, name, value, placeholder, showPassword, setShowP
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`h-9 sm:h-10 w-full rounded-lg border bg-white pl-9 pr-9 text-xs text-[#26364a] outline-none ${
-            error ? "border-red-400" : "border-[#dce2e8] focus:border-[#00a651]"
+          className={`h-9 w-full rounded-lg border bg-white pl-9 pr-9 text-xs text-[#26364a] outline-none transition sm:h-10 ${
+            error
+              ? "border-red-400 focus:border-red-500"
+              : "border-[#dce2e8] focus:border-[#00a651] focus:ring-2 focus:ring-[#00a651]/10"
           }`}
         />
+
+        {/* Eye Button */}
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#718096]"
+          aria-label={
+            showPassword
+              ? "Hide password"
+              : "Show password"
+          }
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#718096] transition hover:text-[#00a651]"
         >
-          {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+          {showPassword ? (
+            <EyeOffIcon />
+          ) : (
+            <EyeIcon />
+          )}
         </button>
+
       </div>
-      {error && <p className="mt-0.5 text-[11px] text-red-500">{error}</p>}
+
+      {error && (
+        <p className="mt-0.5 text-[11px] text-red-500">
+          {error}
+        </p>
+      )}
+
     </div>
   );
 }
+
+
+/* =========================================================
+   SOCIAL BUTTON
+========================================================= */
 
 function SocialButton({
   provider,
@@ -318,103 +790,250 @@ function SocialButton({
     <button
       type="button"
       onClick={onClick}
-      className="flex h-9 items-center justify-center gap-1.5 rounded-lg border border-[#dce2e8] bg-white px-2 text-xs font-medium text-[#26364a] hover:bg-gray-50"
+      className="flex h-9 items-center justify-center gap-1.5 rounded-lg border border-[#dce2e8] bg-white px-2 text-xs font-medium text-[#26364a] transition duration-200 hover:bg-gray-50 hover:shadow-sm active:scale-[0.98]"
     >
       {icon}
-      <span>{provider}</span>
+
+      <span>
+        {provider}
+      </span>
     </button>
   );
 }
 
+
+/* =========================================================
+   USER PLUS BIG ICON
+========================================================= */
+
 function UserPlusBigIcon() {
   return (
-    <svg className="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <svg
+      className="h-7 w-7"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+    >
       <circle cx="9" cy="8" r="3.5" />
+
       <path d="M3.5 19c.7-3 2.5-4.5 5.5-4.5 2 0 3.5.7 4.5 2" />
+
       <path d="M18 10v6M15 13h6" />
     </svg>
   );
 }
 
+
+/* =========================================================
+   USER ICON
+========================================================= */
+
 function UserIcon() {
   return (
-    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <svg
+      className="h-4 w-4"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+    >
       <circle cx="12" cy="8" r="3.5" />
-      <path strokeLinecap="round" d="M5.5 20c.8-3.4 3-5 6.5-5s5.7 1.6 6.5 5" />
+
+      <path
+        strokeLinecap="round"
+        d="M5.5 20c.8-3.4 3-5 6.5-5s5.7 1.6 6.5 5"
+      />
     </svg>
   );
 }
 
+
+/* =========================================================
+   MAIL ICON
+========================================================= */
+
 function MailIcon() {
   return (
-    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-      <rect x="3" y="5" width="18" height="14" rx="2" />
+    <svg
+      className="h-4 w-4"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+    >
+      <rect
+        x="3"
+        y="5"
+        width="18"
+        height="14"
+        rx="2"
+      />
+
       <path d="m3 7 9 6 9-6" />
     </svg>
   );
 }
 
+
+/* =========================================================
+   LOCK ICON
+========================================================= */
+
 function LockIcon() {
   return (
-    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-      <rect x="5" y="10" width="14" height="10" rx="2" />
+    <svg
+      className="h-4 w-4"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+    >
+      <rect
+        x="5"
+        y="10"
+        width="14"
+        height="10"
+        rx="2"
+      />
+
       <path d="M8 10V7a4 4 0 0 1 8 0v3" />
     </svg>
   );
 }
 
+
+/* =========================================================
+   EYE ICON
+========================================================= */
+
 function EyeIcon() {
   return (
-    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <svg
+      className="h-4 w-4"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+    >
       <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+
       <circle cx="12" cy="12" r="2.5" />
     </svg>
   );
 }
 
+
+/* =========================================================
+   EYE OFF ICON
+========================================================= */
+
 function EyeOffIcon() {
   return (
-    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <svg
+      className="h-4 w-4"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+    >
       <path d="m3 3 18 18" />
+
       <path d="M10.6 6.2A10.7 10.7 0 0 1 12 6c6 0 9.5 6 9.5 6a17 17 0 0 1-3.1 3.7" />
+
       <path d="M6.2 6.2C3.8 8 2.5 12 2.5 12s3.5 6 9.5 6c1.3 0 2.5-.3 3.5-.8" />
+
       <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" />
     </svg>
   );
 }
 
+
+/* =========================================================
+   USER PLUS ICON
+========================================================= */
+
 function UserPlusIcon() {
   return (
-    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <svg
+      className="h-4 w-4"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+    >
       <circle cx="9" cy="8" r="3" />
+
       <path d="M3.5 19c.7-3 2.5-4.5 5.5-4.5 2 0 3.5.7 4.5 2" />
+
       <path d="M18 11v6M15 14h6" />
     </svg>
   );
 }
 
+
+/* =========================================================
+   GOOGLE ICON
+========================================================= */
+
 function GoogleIcon() {
   return (
-    <svg className="h-4 w-4" viewBox="0 0 24 24">
-      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
-      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+    <svg
+      className="h-4 w-4"
+      viewBox="0 0 24 24"
+    >
+      <path
+        fill="#4285F4"
+        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
+      />
+
+      <path
+        fill="#34A853"
+        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+      />
+
+      <path
+        fill="#FBBC05"
+        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+      />
+
+      <path
+        fill="#EA4335"
+        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+      />
     </svg>
   );
 }
 
+
+/* =========================================================
+   FACEBOOK ICON
+========================================================= */
+
 function FacebookIcon() {
   return (
-    <svg className="h-4 w-4" fill="#1877F2" viewBox="0 0 24 24">
+    <svg
+      className="h-4 w-4"
+      fill="#1877F2"
+      viewBox="0 0 24 24"
+    >
       <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.414c0-3.026 1.792-4.7 4.533-4.7 1.312 0 2.686.236 2.686.236v2.98h-1.516c-1.491 0-1.956.93-1.956 1.886v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073Z" />
     </svg>
   );
 }
 
+
+/* =========================================================
+   APPLE ICON
+========================================================= */
+
 function AppleIcon() {
   return (
-    <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+    <svg
+      className="h-4 w-4"
+      fill="currentColor"
+      viewBox="0 0 24 24"
+    >
       <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.53 4.08ZM12.03 7.25C11.88 5.02 13.69 3.18 15.77 3c.29 2.58-2.34 4.5-3.74 4.25Z" />
     </svg>
   );
