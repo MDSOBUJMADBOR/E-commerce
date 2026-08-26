@@ -30,7 +30,7 @@ const NewsletterBanner: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto w-full p-4 md:p-6 lg:p-8">
+    <div className="container mx-auto my-5">
       {/* =====================================================
           MAIN NEWSLETTER BANNER
       ===================================================== */}

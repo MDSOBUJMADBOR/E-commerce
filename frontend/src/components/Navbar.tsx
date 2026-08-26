@@ -80,12 +80,12 @@ const Navbar = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 border bg-gray-50">
+    <header className="sticky top-0 z-50  bg-gray-50">
       {/* ================================================= */}
       {/* DESKTOP NAVBAR */}
       {/* ================================================= */}
 
-      <nav className="container mx-auto hidden items-center justify-between gap-2 px-10 py-4 lg:flex">
+      <nav className="container  mx-auto hidden items-center justify-between gap-2 px-5 py-4 lg:flex ">
         {/* Left */}
         <LeftSide />
 
