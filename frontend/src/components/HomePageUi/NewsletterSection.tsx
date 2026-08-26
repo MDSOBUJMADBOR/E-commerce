@@ -39,7 +39,7 @@ const NewsletterBanner: React.FC = () => {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.2 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="relative flex flex-col items-center justify-between gap-6 overflow-hidden rounded-3xl border border-gray-100 bg-[#E9F7F1] px-6 py-8 shadow-sm transition-all duration-300 sm:px-8 lg:flex-row lg:px-10 lg:px-10"
+        className="relative flex flex-col items-center justify-between gap-6 overflow-hidden rounded-2xl  bg-[#E9F7F1] px-6 py-8 shadow-md transition-all duration-300  xl:flex-row  "
       >
         {/* =====================================================
             BACKGROUND DECORATIONS
@@ -109,7 +109,7 @@ const NewsletterBanner: React.FC = () => {
                 height={130}
                 className="h-auto w-[150px] object-contain sm:w-[165px] md:w-[180px]"
               />
-            </motion.div>
+            </motion.div> 
           </motion.div>
 
           {/* =====================================================
