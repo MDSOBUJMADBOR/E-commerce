@@ -1,170 +1,407 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { Mail, SendHorizonal, CheckCircle2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
+import React, { useState } from "react";
+import {
+  Mail,
+  SendHorizontal,
+  CheckCircle2,
+  Sparkles,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 const NewsletterBanner: React.FC = () => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!email) return;
+
+    if (!email.trim()) return;
 
     setIsLoading(true);
 
-    // Simulated API call delay
+    // Simulated API request
     setTimeout(() => {
       setIsLoading(false);
       setIsSubscribed(true);
-    }, 800);
+    }, 1200);
   };
 
   return (
-    <div className="w-full mx-auto p-4 md:p-6 lg:p-8">
-      {/* Main Banner Container */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-6 px-10 md:px-10 py-8 bg-[#E9F7F1] rounded-3xl border border-gray-100 shadow-sm transition-all duration-300">
-        
-        {/* Left Side: Illustration, Text, and Mail Icon */}
-        <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10 text-center md:text-left">
-          
-          {/* Illustration Stack */}
-          {/* <div className="relative w-28 h-28 md:w-36 md:h-36 flex-shrink-0">
-        
-            <div className="absolute top-0 right-3 z-10">
-              <svg 
-                className="w-20 h-24 md:w-24 md:h-28 text-[#00AA55]" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 13v2m0 0a1 1 0 001 1h4a1 1 0 001-1v-2" stroke="#00AA55" strokeOpacity="0.5"/>
-              </svg>
-            </div>
-            
-           
-            <div className="absolute top-4 right-0 z-20">
-              <div className="bg-[#FFC845] w-12 h-14 md:w-14 md:h-16 rounded-lg shadow-md flex flex-col items-center justify-center -rotate-12 border-4 border-white">
-                <span className="text-lg md:text-xl font-bold text-[#444]">%</span>
-                <span className="text-[10px] md:text-xs font-semibold text-[#444]">SAVE</span>
-              </div>
-            </div>
-            
-            
-            <div className="absolute -top-1 -left-2 z-0">
-              <div className="w-4 h-4 bg-[#FFC845] rounded-full rotate-45 border-4 border-white opacity-90"></div>
-            </div>
-            <div className="absolute bottom-6 left-2 z-0">
-              <div className="w-3 h-3 bg-[#1FE0A0] rounded-full rotate-12 border-2 border-white"></div>
-            </div>
-          </div> */}
+    <div className="container mx-auto w-full p-4 md:p-6 lg:p-8">
+      {/* =====================================================
+          MAIN NEWSLETTER BANNER
+      ===================================================== */}
+      <motion.div
+        initial={{ opacity: 0, y: 25 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="relative flex flex-col items-center justify-between gap-6 overflow-hidden rounded-3xl border border-gray-100 bg-[#E9F7F1] px-6 py-8 shadow-sm transition-all duration-300 sm:px-8 lg:flex-row lg:px-10 lg:px-10"
+      >
+        {/* =====================================================
+            BACKGROUND DECORATIONS
+        ===================================================== */}
 
-<Image
-  src="/images/NewsletterSection-image.png"
-  alt="Best deals"
-  width={180}
-  height={130}
-  className="h-auto w-[180px] object-contain"
-/>
+        <motion.div
+          animate={{
+            scale: [1, 1.08, 1],
+            opacity: [0.25, 0.4, 0.25],
+          }}
+          transition={{
+            duration: 5,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-[#00AA55]/10 blur-2xl"
+        />
 
+        <motion.div
+          animate={{
+            scale: [1, 1.15, 1],
+            opacity: [0.2, 0.35, 0.2],
+          }}
+          transition={{
+            duration: 6,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1,
+          }}
+          className="pointer-events-none absolute -bottom-24 -left-20 h-52 w-52 rounded-full bg-[#1FE0A0]/10 blur-2xl"
+        />
 
+        {/* =====================================================
+            LEFT SIDE
+        ===================================================== */}
 
+        <div className="relative z-10 flex w-full flex-col items-center gap-6 text-center md:w-auto md:flex-row md:gap-10 md:text-left">
+          {/* =====================================================
+              ILLUSTRATION
+          ===================================================== */}
 
+          <motion.div
+            initial={{ opacity: 0, x: -25 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            whileHover={{
+              y: -5,
+              rotate: 1,
+            }}
+            className="shrink-0"
+          >
+            <motion.div
+              animate={{
+                y: [0, -5, 0],
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            >
+              <Image
+                src="/images/NewsletterSection-image.png"
+                alt="Best deals"
+                width={180}
+                height={130}
+                className="h-auto w-[150px] object-contain sm:w-[165px] md:w-[180px]"
+              />
+            </motion.div>
+          </motion.div>
 
-          {/* Text and Mail Icon Group */}
+          {/* =====================================================
+              TEXT + MAIL ICON
+          ===================================================== */}
+
           <div className="flex flex-col gap-2">
-            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 text-center md:text-left justify-center md:justify-start">
-              {/* Envelope Icon */}
-              <div className="flex items-center justify-center w-10 h-10 border border-[#00AA55] rounded-full p-2.5 bg-white/50">
-                <Mail className="w-full h-full text-[#00AA55]" />
-              </div>
-              
-              {/* Title Text */}
-              <h2 className="text-2xl md:text-3xl font-bold text-[#1A1A1A]">
-                Get the <span className="text-[#00AA55]">Best Deals</span> First!
+            <div className="flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-3 lg:justify-start">
+              {/* Mail Icon */}
+              <motion.div
+                animate={{
+                  y: [0, -3, 0],
+                }}
+                transition={{
+                  duration: 2.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#00AA55] bg-white/70 p-2.5 shadow-sm"
+              >
+                <Mail className="h-full w-full text-[#00AA55]" />
+              </motion.div>
+
+              {/* Heading */}
+              <h2 className="text-xl font-bold leading-tight text-[#1A1A1A] sm:text-2xl md:text-3xl">
+                Get the{" "}
+                <span className="text-[#00AA55]">
+                  Best Deals
+                </span>{" "}
+                First!
               </h2>
             </div>
-            
-            {/* Subtitle Text */}
-            <p className="text-sm md:text-base text-gray-700 mt-1 max-w-sm">
+
+            {/* Subtitle */}
+            <p className="mx-auto mt-1 max-w-sm text-sm leading-6 text-gray-700 md:mx-0 md:text-base">
               Subscribe to our newsletter and never miss amazing offers.
             </p>
           </div>
         </div>
 
-        {/* Right Side: Form / Success Message with Animated Transition */}
-        <div className="w-full max-w-lg min-h-[60px] flex items-center justify-center">
+        {/* =====================================================
+            RIGHT SIDE
+        ===================================================== */}
+
+        <div className="relative z-10 flex min-h-[60px] w-full max-w-lg items-center justify-center md:w-auto md:flex-1">
           <AnimatePresence mode="wait">
             {!isSubscribed ? (
-              /* Input Form State */
+              /* =================================================
+                 SUBSCRIBE FORM
+              ================================================= */
+
               <motion.form
                 key="subscribe-form"
-                initial={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                transition={{ duration: 0.2 }}
+                initial={{
+                  opacity: 0,
+                  x: 25,
+                }}
+                animate={{
+                  opacity: 1,
+                  x: 0,
+                }}
+                exit={{
+                  opacity: 0,
+                  scale: 0.95,
+                  y: -10,
+                }}
+                transition={{
+                  duration: 0.35,
+                  ease: "easeOut",
+                }}
                 onSubmit={handleSubmit}
-                className="flex flex-col sm:flex-row items-center gap-3 w-full"
+                className="flex w-full flex-col items-center gap-3 sm:flex-row"
               >
-                <div className="relative flex-grow w-full">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input 
+                {/* Email Input */}
+                <motion.div
+                  whileFocus={{
+                    scale: 1.01,
+                  }}
+                  className="relative w-full flex-grow"
+                >
+                  <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+
+                  <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email address..."
                     required
                     disabled={isLoading}
-                    className="w-full px-5 py-4 pl-12 bg-white rounded-full border border-gray-100 placeholder:text-gray-400 text-gray-800 focus:ring-2 focus:ring-[#1FE0A0] focus:border-transparent outline-none transition"
+                    className="h-[54px] w-full rounded-full border border-gray-100 bg-white px-5 pl-12 text-sm text-gray-800 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[#00AA55] focus:ring-2 focus:ring-[#00AA55]/20 disabled:cursor-not-allowed disabled:opacity-70 sm:text-base"
                   />
-                </div>
-                
-                <button 
+                </motion.div>
+
+                {/* Subscribe Button */}
+                <motion.button
                   type="submit"
                   disabled={isLoading}
-                  className="flex items-center justify-center gap-2 px-8 py-4 bg-[#00AA55] hover:bg-[#008F48] text-white rounded-full font-semibold whitespace-nowrap shadow-md transition-all duration-150 hover:shadow-lg w-full sm:w-auto disabled:opacity-75"
+                  whileHover={!isLoading ? { scale: 1.03 } : {}}
+                  whileTap={!isLoading ? { scale: 0.97 } : {}}
+                  className="flex h-[54px] w-full shrink-0 items-center justify-center gap-2 rounded-full bg-[#00AA55] px-8 font-semibold text-white shadow-md transition-all duration-300 hover:bg-[#008F48] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-75 sm:w-auto"
                 >
                   {isLoading ? (
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <>
+                      {/* Loading Spinner */}
+                      <motion.div
+                        animate={{
+                          rotate: 360,
+                        }}
+                        transition={{
+                          duration: 0.8,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                        className="h-5 w-5 rounded-full border-2 border-white border-t-transparent"
+                      />
+
+                      <span>Subscribing...</span>
+                    </>
                   ) : (
                     <>
-                     <div className='cursor-pointer flex items-center gap-2'>
-                         <SendHorizonal className="h-5 w-5 -rotate-45" />
+                      <SendHorizontal className="h-5 w-5 -rotate-45" />
+
                       <span>Subscribe</span>
-                     </div>
                     </>
                   )}
-                </button>
+                </motion.button>
               </motion.form>
             ) : (
-              /* Success Message State */
+              /* =================================================
+                 SUCCESS UI
+              ================================================= */
+
               <motion.div
                 key="success-message"
-                initial={{ opacity: 0, scale: 0.8, y: 10 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                className="flex items-center gap-3 bg-white px-6 py-4 rounded-full border border-[#00AA55]/20 shadow-md text-[#00AA55] w-full justify-center"
+                initial={{
+                  opacity: 0,
+                  scale: 0.8,
+                  y: 20,
+                }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                  y: 0,
+                }}
+                exit={{
+                  opacity: 0,
+                  scale: 0.8,
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 260,
+                  damping: 18,
+                }}
+                className="relative flex w-full items-center justify-center overflow-hidden rounded-2xl border border-[#00AA55]/20 bg-white px-5 py-4 shadow-md sm:rounded-full sm:px-6"
               >
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.1, type: 'spring', stiffness: 500 }}
-                >
-                  <CheckCircle2 className="w-7 h-7 text-[#00AA55]" />
-                </motion.div>
-                <div className="text-left">
-                  <h4 className="font-bold text-gray-900 text-sm md:text-base">Thank you for subscribing!</h4>
-                  <p className="text-xs text-gray-500">We have sent a confirmation to <span className="font-medium text-gray-700">{email}</span></p>
+                {/* =================================================
+                    SUCCESS PARTICLES
+                ================================================= */}
+
+                <motion.span
+                  initial={{
+                    opacity: 0,
+                    scale: 0,
+                    x: 0,
+                    y: 0,
+                  }}
+                  animate={{
+                    opacity: [0, 1, 0],
+                    scale: [0, 1, 0.8],
+                    x: -45,
+                    y: -20,
+                  }}
+                  transition={{
+                    duration: 1,
+                    delay: 0.1,
+                  }}
+                  className="absolute left-1/2 top-1/2 h-2 w-2 rounded-full bg-[#00AA55]"
+                />
+
+                <motion.span
+                  initial={{
+                    opacity: 0,
+                    scale: 0,
+                    x: 0,
+                    y: 0,
+                  }}
+                  animate={{
+                    opacity: [0, 1, 0],
+                    scale: [0, 1, 0.8],
+                    x: 45,
+                    y: -15,
+                  }}
+                  transition={{
+                    duration: 1,
+                    delay: 0.2,
+                  }}
+                  className="absolute left-1/2 top-1/2 h-2 w-2 rounded-full bg-[#1FE0A0]"
+                />
+
+                <motion.span
+                  initial={{
+                    opacity: 0,
+                    scale: 0,
+                  }}
+                  animate={{
+                    opacity: [0, 1, 0],
+                    scale: [0, 1, 0.8],
+                    x: 30,
+                    y: 25,
+                  }}
+                  transition={{
+                    duration: 1,
+                    delay: 0.3,
+                  }}
+                  className="absolute left-1/2 top-1/2 h-1.5 w-1.5 rounded-full bg-[#FFC845]"
+                />
+
+                {/* =================================================
+                    SUCCESS CONTENT
+                ================================================= */}
+
+                <div className="relative z-10 flex w-full items-center gap-3">
+                  {/* Animated Check Circle */}
+                  <motion.div
+                    initial={{
+                      scale: 0,
+                      rotate: -45,
+                    }}
+                    animate={{
+                      scale: 1,
+                      rotate: 0,
+                    }}
+                    transition={{
+                      delay: 0.1,
+                      type: "spring",
+                      stiffness: 450,
+                      damping: 15,
+                    }}
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#E9F7F1]"
+                  >
+                    <CheckCircle2 className="h-7 w-7 text-[#00AA55]" />
+                  </motion.div>
+
+                  {/* Text */}
+                  <motion.div
+                    initial={{
+                      opacity: 0,
+                      x: 15,
+                    }}
+                    animate={{
+                      opacity: 1,
+                      x: 0,
+                    }}
+                    transition={{
+                      delay: 0.25,
+                      duration: 0.4,
+                    }}
+                    className="min-w-0 flex-1 text-left"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <h4 className="text-sm font-bold text-gray-900 sm:text-base">
+                        Subscription Successful!
+                      </h4>
+
+                      <motion.div
+                        animate={{
+                          rotate: [0, 15, -15, 0],
+                          scale: [1, 1.15, 1],
+                        }}
+                        transition={{
+                          duration: 1.5,
+                          repeat: Infinity,
+                          repeatDelay: 2,
+                        }}
+                      >
+                        <Sparkles className="h-4 w-4 text-[#00AA55]" />
+                      </motion.div>
+                    </div>
+
+                    <p className="mt-0.5 truncate text-xs text-gray-500 sm:text-sm">
+                      Thank you! We&apos;ll send amazing deals to{" "}
+                      <span className="font-semibold text-gray-700">
+                        {email}
+                      </span>
+                    </p>
+                  </motion.div>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
-
-      </div>
+      </motion.div>
     </div>
   );
 };
