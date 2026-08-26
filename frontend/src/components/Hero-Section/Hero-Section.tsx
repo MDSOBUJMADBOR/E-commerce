@@ -30,7 +30,8 @@ const slides: Slide[] = [
     titleLine2: "For You",
     description: "Explore the latest trends and bestsellers.",
     buttonText: "Explore Now",
-    buttonLink: "/shop",
+    buttonLink: "/shop", 
+    
   },
   {
     id: 2,
