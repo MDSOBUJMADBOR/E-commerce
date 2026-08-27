@@ -8,12 +8,12 @@ import { FaXTwitter } from "react-icons/fa6";
 
 const FooterSection = () => {
   return (
-    <footer className="relative container mx-auto px-5  overflow-hidden bg-[#003425] font-sans text-white ">
+    <footer className="relative   overflow-hidden bg-[#003425] font-sans text-white ">
       {/* Background Subtle Gradient Glow */}
       <div className="pointer-events-none absolute -right-20 -top-20 h-96 w-96 rounded-full bg-[#05573e] opacity-40 blur-3xl " />
       <div className="pointer-events-none absolute -bottom-20 -left-20 h-96 w-96 rounded-full bg-[#05573e] opacity-30 blur-3xl" />
 
-      <div className="relative  pt-12 pb-8 ">
+      <div className="relative container mx-auto px-5  pt-12 pb-8">
 
         {/* Main Grid Layout */}
         <div className=" grid grid-cols-2 gap-6 md:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1.2fr_1fr_1.2fr] ">
