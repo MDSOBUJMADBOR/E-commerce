@@ -47,11 +47,21 @@ export default function RightSide() {
       {/* Create Account */}
       <Link
         href="/signup"
-        className="flex items-center gap-1 text-sm xl:text-base rounded-lg bg-green-600 px-2 xl:px-3  py-2 xl:py-3   text-white shadow-sm transition-all duration-200 hover:bg-green-700 hover:shadow-md active:scale-95"
+        className="flex items-center gap-1 text-sm xl:text-base rounded-lg bg-green-600 px-2 xl:px-3  py-2 xl:py-3 font-bold  text-white
+              shadow-lg
+              shadow-emerald-600/20
+              transition-all
+              duration-300
+              hover:-translate-y-0.5
+              hover:bg-emerald-700
+              hover:shadow-xl
+              hover:shadow-emerald-600/25
+              active:scale-95
+              sm:w-auto"
       >
         <UserRoundPlus className="h-6 w-6 stroke-[1.8]" />
 
-        <span>Create Account</span>
+        <span >Create Account</span>
       </Link>
     </div>
   );
