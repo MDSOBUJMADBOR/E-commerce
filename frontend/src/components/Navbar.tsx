@@ -227,7 +227,7 @@ const Navbar = () => {
 
                 <motion.div
                   initial={{
-                    opacity: 0,
+                    opacity: 0, 
                     x: -20,
                   }}
                   animate={{
