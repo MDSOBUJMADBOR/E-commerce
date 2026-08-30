@@ -11,7 +11,7 @@ import {
 
 const NotFoundPage = () => {
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-[#effaf6] via-white to-[#e7f7f0] px-5 py-12 sm:px-8 lg:px-10">
+    <main className="relative container mx-auto flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-[#effaf6] via-white to-[#e7f7f0] px-5 py-12 sm:px-8 lg:px-10">
 
       {/* =====================================================
           BACKGROUND DECORATIONS
