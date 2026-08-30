@@ -105,15 +105,13 @@ const RightSideSignUp = () => {
     setIsSubmitting(true);
 
     // Console form data
-    console.log("=================================");
-    console.log("       CREATE ACCOUNT DATA        ");
-    console.log("=================================");
+  
     console.log("Full Name:", formData.fullName);
     console.log("Email:", formData.email);
     console.log("Password:", formData.password);
     console.log("Confirm Password:", formData.confirmPassword);
     console.log("Agree Terms:", formData.agreeTerms);
-    console.log("=================================");
+   
 
     try {
       // Fake API delay
