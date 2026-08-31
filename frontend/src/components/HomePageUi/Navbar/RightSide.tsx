@@ -4,8 +4,15 @@ import Link from "next/link";
 import { Heart, ShoppingCart, UserRoundPlus } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { useRef, useState } from "react";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
 
-
+import {
+  UserRound,
+  Package,
+  Settings,
+  LogOut,
+} from "lucide-react";
 
 
 
@@ -20,6 +27,8 @@ export default function RightSide() {
   const user = session?.user;
   console.log(user,'usernavbar');
 
+
+const pathname = usePathname();
 
 
   const handleLogout = async () => {
@@ -113,98 +122,165 @@ export default function RightSide() {
     {/* Profile Image */}
     <div className="h-9 w-9 rounded-full bg-[#00a957] p-[2px] transition-transform duration-200 hover:scale-105">
       <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full bg-[#eff9f3]">
-        {user?.image ? (
-          <img
-            src={user.image }
-            alt={user.name || "User"}
-            className="h-full w-full rounded-full object-cover"
-          />
-        ) : (
-          
-          <img
-            src={"https://i.ibb.co.com/gZbTBWNS/sobuj.jpg"}
-            alt={user.name || "User"}
-            className="h-full w-full rounded-full object-cover"
-          />
+                  
+         <Image
+  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQEy7pwqmpRqSf5t5v1dCOJsCsYlXeBGjIg3i3Z2HIzvg&s=10"
+  alt={user.name || "User"}
+  width={36}
+  height={36}
+  className="h-full w-full rounded-full object-cover"
+/>
 
-        )}
+        
       </div>
     </div>
   </button>
 
   {/* Profile Dropdown */}
-  {profileOpen && (
-    <div
-      className="
-        absolute right-0 z-50 mt-3 w-60
-        overflow-hidden rounded-xl
-        border border-[#dfe4e8]
-        bg-white
-        p-2
-        shadow-[0_10px_35px_rgba(23,50,77,0.15)]
-        animate-fade-in
-      "
-    >
-      {/* User Information */}
-      <div className="mb-2 border-b border-[#e8ecef] px-3 py-3">
-        <p className="text-[11px] font-medium text-[#788596]">
-          Signed in as
+{profileOpen && (
+  <div
+    className="
+      absolute right-0 z-50 mt-3 w-[245px]
+      overflow-hidden rounded-lg
+      border border-[#e5e7eb]
+      bg-white
+      shadow-[0_4px_18px_rgba(23,50,77,0.12)]
+    "
+  >
+    {/* User Information */}
+    <div className="flex items-center gap-3 border-b border-[#edf0f2] px-4 py-3">
+
+
+      {/* Name & Email */}
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold text-[#17324d]">
+          {user?.name || "sobuj"}
         </p>
 
-        <p className="mt-1 truncate text-sm font-bold text-[#17324d]">
-          {user?.name}
-        </p>
-
-        <p className="mt-0.5 truncate text-[11px] text-[#68788c]">
-          {user?.email}
+        <p className="truncate text-[11px] text-[#68788c]">
+          {user?.email || "sobuj@example.com"}
         </p>
       </div>
 
-      {/* Dashboard Button */}
+      {/* Arrow */}
+      <span className="text-[#68788c]">›</span>
+    </div>
+
+    {/* Menu Items */}
+    <div className="py-2">
+
+      {/* My Profile */}
       <Link
-        href="/dashboard/user/overview"
+        href="/profile"
         onClick={() => setProfileOpen(false)}
-        className="block mb-2"
+        className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors duration-200 ${
+          pathname === "/profile"
+            ? "bg-[#eff9f3] font-semibold text-[#00a957]"
+            : "text-[#374151] hover:bg-[#f7f9fa]"
+        }`}
       >
-        <button
-          type="button"
-          className="
-            w-full rounded-lg
-            bg-[#eff9f3]
-            py-2.5
-            text-xs font-semibold
-            text-[#00a957]
-            cursor-pointer
-            transition-all duration-200
-            hover:bg-[#e1f5e9]
-            hover:text-[#008f4c]
-          "
-        >
-          Dashboard
-        </button>
+        <UserRound
+          size={17}
+          strokeWidth={1.8}
+          className={
+            pathname === "/profile"
+              ? "text-[#00a957]"
+              : "text-[#596777]"
+          }
+        />
+
+        <span>My Profile</span>
       </Link>
 
-      {/* Logout Button */}
+      {/* My Orders */}
+      <Link
+        href="/orders"
+        onClick={() => setProfileOpen(false)}
+        className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors duration-200 ${
+          pathname === "/orders"
+            ? "bg-[#eff9f3] font-semibold text-[#00a957]"
+            : "text-[#374151] hover:bg-[#f7f9fa]"
+        }`}
+      >
+        <Package
+          size={17}
+          strokeWidth={1.8}
+          className={
+            pathname === "/orders"
+              ? "text-[#00a957]"
+              : "text-[#596777]"
+          }
+        />
+
+        <span>My Orders</span>
+      </Link>
+
+      {/* Wishlist */}
+      <Link
+        href="/wishlist"
+        onClick={() => setProfileOpen(false)}
+        className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors duration-200 ${
+          pathname === "/wishlist"
+            ? "bg-[#eff9f3] font-semibold text-[#00a957]"
+            : "text-[#374151] hover:bg-[#f7f9fa]"
+        }`}
+      >
+        <Heart
+          size={17}
+          strokeWidth={1.8}
+          className={
+            pathname === "/wishlist"
+              ? "text-[#00a957]"
+              : "text-[#596777]"
+          }
+        />
+
+        <span>Wishlist</span>
+      </Link>
+
+      {/* Settings */}
+      <Link
+        href="/settings"
+        onClick={() => setProfileOpen(false)}
+        className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors duration-200 ${
+          pathname === "/settings"
+            ? "bg-[#eff9f3] font-semibold text-[#00a957]"
+            : "text-[#374151] hover:bg-[#f7f9fa]"
+        }`}
+      >
+        <Settings
+          size={17}
+          strokeWidth={1.8}
+          className={
+            pathname === "/settings"
+              ? "text-[#00a957]"
+              : "text-[#596777]"
+          }
+        />
+
+        <span>Settings</span>
+      </Link>
+
+      {/* Logout */}
       <button
         type="button"
         onClick={handleLogout}
         className="
-          block w-full
-          rounded-lg
-          bg-[#fff1f1]
+          flex w-full items-center gap-3
           px-4 py-2.5
-          text-center
-          text-xs font-semibold
-          text-[#dc3545]
-          cursor-pointer
-          transition-all duration-200
-          hover:bg-[#ffe2e2]
+          text-left text-sm
+          text-[#ff3b30]
+          transition-colors duration-200
+          hover:bg-[#fff5f4]
         "
       >
-        Log Out
+        <LogOut size={17} strokeWidth={1.8} />
+        <span>Logout</span>
       </button>
+
     </div>
-  )}
+  </div>
+)}
 </div>
 
 
