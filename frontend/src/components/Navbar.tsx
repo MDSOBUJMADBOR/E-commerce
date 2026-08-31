@@ -28,7 +28,7 @@ import { motion } from "framer-motion";
 import RightSide from "./HomePageUi/Navbar/RightSide";
 import Middle from "./HomePageUi/Navbar/Middle";
 import LeftSide from "./HomePageUi/Navbar/LeftSide";
-import { authClient } from "@/lib/auth-client";
+
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -81,9 +81,9 @@ const Navbar = () => {
   };
 
 
-  const { data: session, isPending } = authClient.useSession();
-  const user = session?.user;
-  console.log(user,'usernavbar');
+  // const { data: session, isPending } = authClient.useSession();
+  // const user = session?.user;
+  // console.log(user,'usernavbar');
 
 
 
