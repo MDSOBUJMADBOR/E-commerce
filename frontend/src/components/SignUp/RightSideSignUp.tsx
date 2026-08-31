@@ -1,5 +1,7 @@
+
 "use client";
 
+import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -29,6 +31,7 @@ const RightSideSignUp = () => {
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
+  const [submitError, setSubmitError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,11 +49,17 @@ const RightSideSignUp = () => {
       [name]: type === "checkbox" ? checked : value,
     }));
 
+    // Clear field error
     if (errors[name as keyof FormErrors]) {
       setErrors((prev) => ({
         ...prev,
         [name]: undefined,
       }));
+    }
+
+    // Clear server error
+    if (submitError) {
+      setSubmitError("");
     }
   };
 
@@ -61,28 +70,40 @@ const RightSideSignUp = () => {
   const validate = (): boolean => {
     const newErrors: FormErrors = {};
 
+    // Full Name
     if (!formData.fullName.trim()) {
       newErrors.fullName = "Full name is required";
+    } else if (formData.fullName.trim().length < 2) {
+      newErrors.fullName = "Full name must be at least 2 characters";
     }
 
+    // Email
     if (!formData.email.trim()) {
       newErrors.email = "Email address is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Please enter a valid email address";
     }
 
+    // Password
     if (!formData.password) {
       newErrors.password = "Password is required";
     } else if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
+      newErrors.password =
+        "Password must be at least 8 characters";
     }
 
+    // Confirm Password
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "Please confirm your password";
-    } else if (formData.confirmPassword !== formData.password) {
-      newErrors.confirmPassword = "Passwords do not match";
+      newErrors.confirmPassword =
+        "Please confirm your password";
+    } else if (
+      formData.confirmPassword !== formData.password
+    ) {
+      newErrors.confirmPassword =
+        "Passwords do not match";
     }
 
+    // Terms
     if (!formData.agreeTerms) {
       newErrors.agreeTerms =
         "You must agree to the Terms & Conditions";
@@ -94,33 +115,53 @@ const RightSideSignUp = () => {
   };
 
   // =========================================================
-  // CREATE ACCOUNT
+  // CREATE ACCOUNT WITH BETTER AUTH
   // =========================================================
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
 
-    if (!validate()) return;
+    setSubmitError("");
+
+    // Validate form
+    if (!validate()) {
+      return;
+    }
 
     setIsSubmitting(true);
 
-    // Console form data
-  
-    console.log("Full Name:", formData.fullName);
-    console.log("Email:", formData.email);
-    console.log("Password:", formData.password);
-    console.log("Confirm Password:", formData.confirmPassword);
-    console.log("Agree Terms:", formData.agreeTerms);
-   
-
     try {
-      // Fake API delay
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+      // Better Auth requires "name", not "fullName"
+      const { data, error } =
+        await authClient.signUp.email({
+          name: formData.fullName.trim(),
+          email: formData.email.trim(),
+          password: formData.password,
+          callbackURL: "/",
+        });
 
-      // Show success screen
+      // Better Auth error
+      if (error) {
+        setSubmitError(
+          error.message || "Failed to create account"
+        );
+        return;
+      }
+
+      // Success
+      console.log("Account created successfully:", data);
+
       setIsSuccess(true);
     } catch (error) {
-      console.error("Submission error:", error);
+      console.error("Signup error:", error);
+
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again." 
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -130,16 +171,73 @@ const RightSideSignUp = () => {
   // SOCIAL SIGN UP
   // =========================================================
 
-  const googleSignUp = () => {
-    alert("Google Sign Up clicked");
+  const googleSignUp = async () => {
+    try {
+      const { error } =
+        await authClient.signIn.social({
+          provider: "google",
+          callbackURL: "/",
+        });
+
+      if (error) {
+        setSubmitError(
+          error.message || "Google sign up failed"
+        );
+      }
+    } catch (error) {
+      console.error("Google signup error:", error);
+
+      setSubmitError(
+        "Unable to continue with Google"
+      );
+    }
   };
 
-  const facebookSignUp = () => {
-    alert("Facebook Sign Up clicked");
+  const facebookSignUp = async () => {
+    try {
+      const { error } =
+        await authClient.signIn.social({
+          provider: "facebook",
+          callbackURL: "/",
+        });
+
+      if (error) {
+        setSubmitError(
+          error.message || "Facebook sign up failed"
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Facebook signup error:",
+        error
+      );
+
+      setSubmitError(
+        "Unable to continue with Facebook"
+      );
+    }
   };
 
-  const appleSignUp = () => {
-    alert("Apple Sign Up clicked");
+  const appleSignUp = async () => {
+    try {
+      const { error } =
+        await authClient.signIn.social({
+          provider: "apple",
+          callbackURL: "/",
+        });
+
+      if (error) {
+        setSubmitError(
+          error.message || "Apple sign up failed"
+        );
+      }
+    } catch (error) {
+      console.error("Apple signup error:", error);
+
+      setSubmitError(
+        "Unable to continue with Apple"
+      );
+    }
   };
 
   // =========================================================
@@ -147,7 +245,7 @@ const RightSideSignUp = () => {
   // =========================================================
 
   return (
-    <div className="relative flex min-h-full w-full items-center justify-center overflow-hidden bg-white px-5 py-6 sm:px-8 lg:w-1/2 lg:px-10">
+    <div className="relative flex min-h-full w-full items-center justify-center overflow-hidden bg-white px-5 py-6 sm:px-8 lg:w-1/2 lg:px-10 ">
 
       {/* =====================================================
           BACKGROUND DECORATION
@@ -165,7 +263,7 @@ const RightSideSignUp = () => {
           MAIN CONTENT
       ===================================================== */}
 
-      <div className="relative z-10 w-full">
+      <div className="relative z-10 w-full ">
 
         {/* ===================================================
             SUCCESS UI
@@ -184,17 +282,14 @@ const RightSideSignUp = () => {
 
             <div className="mb-5 flex flex-col items-center text-center">
 
-              {/* Icon */}
               <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-[#00a651]">
                 <UserPlusBigIcon />
               </div>
 
-              {/* Title */}
               <h2 className="text-2xl font-bold text-[#26364a]">
                 Create Your Account
               </h2>
 
-              {/* Description */}
               <p className="mt-1 text-xs text-[#64748b] sm:text-sm">
                 Join{" "}
                 <span className="font-semibold text-[#00a651]">
@@ -202,8 +297,17 @@ const RightSideSignUp = () => {
                 </span>{" "}
                 and start shopping today!
               </p>
-
             </div>
+
+            {/* =================================================
+                SERVER ERROR
+            ================================================= */}
+
+            {submitError && (
+              <div className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-center text-xs text-red-600">
+                {submitError}
+              </div>
+            )}
 
             {/* =================================================
                 FORM
@@ -211,7 +315,7 @@ const RightSideSignUp = () => {
 
             <form
               onSubmit={handleSubmit}
-              className="space-y-3"
+              className="space-y-1"
             >
 
               {/* Full Name */}
@@ -321,7 +425,6 @@ const RightSideSignUp = () => {
 
                 {isSubmitting ? (
                   <>
-                    {/* Loading Spinner */}
                     <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
 
                     <span>
@@ -425,22 +528,14 @@ function SuccessScreen({
   return (
     <div className="flex flex-col items-center justify-center py-6 text-center">
 
-      {/* =====================================================
-          SUCCESS ICON
-      ===================================================== */}
-
       <div className="relative mb-6">
 
-        {/* Outer Pulse */}
         <div className="absolute inset-0 animate-ping rounded-full bg-[#00a651]/10" />
 
-        {/* Outer Circle */}
         <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-[#ecfdf3]">
 
-          {/* Inner Circle */}
           <div className="flex h-[70px] w-[70px] items-center justify-center rounded-full bg-[#00a651] shadow-lg shadow-[#00a651]/25 animate-[scaleIn_0.5s_ease-out]">
 
-            {/* Check */}
             <svg
               className="h-10 w-10 animate-[checkDraw_0.6s_ease-out_0.3s_both]"
               viewBox="0 0 52 52"
@@ -456,18 +551,13 @@ function SuccessScreen({
             </svg>
 
           </div>
-
         </div>
 
-        {/* Small Decorative Dots */}
         <span className="absolute -right-2 top-2 h-3 w-3 animate-bounce rounded-full bg-[#00a651]" />
+
         <span className="absolute -bottom-1 -left-2 h-2.5 w-2.5 animate-bounce rounded-full bg-[#7dd3a7] [animation-delay:150ms]" />
 
       </div>
-
-      {/* =====================================================
-          SUCCESS TITLE
-      ===================================================== */}
 
       <div className="animate-[fadeUp_0.6s_ease-out_0.2s_both]">
 
@@ -485,10 +575,6 @@ function SuccessScreen({
 
       </div>
 
-      {/* =====================================================
-          USER INFO
-      ===================================================== */}
-
       <div className="mt-5 w-full max-w-sm animate-[fadeUp_0.6s_ease-out_0.35s_both]">
 
         <div className="rounded-xl border border-[#e4eee8] bg-[#f8fcfa] px-4 py-3">
@@ -505,23 +591,14 @@ function SuccessScreen({
 
       </div>
 
-      {/* =====================================================
-          MESSAGE
-      ===================================================== */}
-
       <p className="mt-5 max-w-sm text-xs leading-5 text-[#718096] animate-[fadeUp_0.6s_ease-out_0.5s_both]">
         Your account has been successfully created.
         You can now explore products and enjoy shopping
         with ShopEasy.
       </p>
 
-      {/* =====================================================
-          BUTTONS
-      ===================================================== */}
-
       <div className="mt-6 flex w-full max-w-sm flex-col gap-2.5 animate-[fadeUp_0.6s_ease-out_0.65s_both]">
 
-        {/* Continue Shopping */}
         <Link
           href="/"
           className="flex h-11 items-center justify-center rounded-lg bg-[#00a651] text-sm font-semibold text-white shadow-sm transition duration-200 hover:bg-[#009447] hover:shadow-md active:scale-[0.98]"
@@ -529,7 +606,6 @@ function SuccessScreen({
           Continue Shopping
         </Link>
 
-        {/* Sign In */}
         <Link
           href="/signin"
           className="flex h-11 items-center justify-center rounded-lg border border-[#dce5df] bg-white text-sm font-semibold text-[#00a651] transition duration-200 hover:bg-[#f5faf7] active:scale-[0.98]"
@@ -538,10 +614,6 @@ function SuccessScreen({
         </Link>
 
       </div>
-
-      {/* =====================================================
-          SUCCESS BADGE
-      ===================================================== */}
 
       <div className="mt-6 flex items-center gap-2 text-[11px] text-[#7a8797] animate-[fadeUp_0.6s_ease-out_0.8s_both]">
 
@@ -564,10 +636,6 @@ function SuccessScreen({
         Account setup completed successfully
 
       </div>
-
-      {/* =====================================================
-          CUSTOM ANIMATION
-      ===================================================== */}
 
       <style jsx>{`
         @keyframes scaleIn {
@@ -640,7 +708,9 @@ function InputField({
   placeholder: string;
   error?: string;
   icon: React.ReactNode;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => void;
 }) {
   return (
     <div>
@@ -706,7 +776,9 @@ function PasswordField({
   showPassword: boolean;
   setShowPassword: (value: boolean) => void;
   error?: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => void;
 }) {
   return (
     <div>
@@ -720,12 +792,10 @@ function PasswordField({
 
       <div className="relative">
 
-        {/* Lock Icon */}
         <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#718096]">
           <LockIcon />
         </div>
 
-        {/* Input */}
         <input
           id={name}
           name={name}
@@ -740,10 +810,11 @@ function PasswordField({
           }`}
         />
 
-        {/* Eye Button */}
         <button
           type="button"
-          onClick={() => setShowPassword(!showPassword)}
+          onClick={() =>
+            setShowPassword(!showPassword)
+          }
           aria-label={
             showPassword
               ? "Hide password"
@@ -792,9 +863,7 @@ function SocialButton({
     >
       {icon}
 
-      <span>
-        {provider}
-      </span>
+      <span>{provider}</span>
     </button>
   );
 }
@@ -1036,3 +1105,4 @@ function AppleIcon() {
     </svg>
   );
 }
+
