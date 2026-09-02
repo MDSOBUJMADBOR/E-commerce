@@ -16,8 +16,7 @@ import {
   Menu,
   ChevronRight,
   Flame,
-  LogIn,
-  Gift,
+  LogOut,
 } from "lucide-react";
 
 import Link from "next/link";
@@ -28,6 +27,8 @@ import { motion } from "framer-motion";
 import RightSide from "./HomePageUi/Navbar/RightSide";
 import Middle from "./HomePageUi/Navbar/Middle";
 import LeftSide from "./HomePageUi/Navbar/LeftSide";
+import { authClient } from "@/lib/auth-client";
+
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -35,7 +36,7 @@ const Navbar = () => {
 
   // ================= MENU ITEMS =================
 
-  const menuItems = [
+  const menuItems = [ 
     {
       name: "Home",
       icon: Home,
@@ -78,6 +79,18 @@ const Navbar = () => {
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
   };
+
+
+  const { data: session, isPending } = authClient.useSession();
+  const user = session?.user;
+  console.log(user,'usernavbar');
+
+   const handleLogout = async () => {
+      await authClient.signOut();
+      
+     
+    }
+
 
   return (
     <header className="sticky top-0 z-50  bg-gray-50">
@@ -227,7 +240,7 @@ const Navbar = () => {
 
                 <motion.div
                   initial={{
-                    opacity: 0,
+                    opacity: 0, 
                     x: -20,
                   }}
                   animate={{
@@ -404,58 +417,17 @@ const Navbar = () => {
                     className="my-5 h-px w-full origin-left bg-gray-200"
                   />
 
-                  {/* ================================================= */}
-                  {/* LOGIN BUTTON */}
-                  {/* ================================================= */}
-
-                  <motion.div
-                    initial={{
-                      opacity: 0,
-                      y: 15,
-                    }}
-                    animate={{
-                      opacity: 1,
-                      y: 0,
-                    }}
-                    transition={{
-                      duration: 0.35,
-                      delay: 0.7,
-                    }}
-                  >
-                    <Link
-                      href="/login"
-                      onClick={closeMobileMenu}
-                      className="
-                        flex
-                        h-[46px]
-                        w-full
-                        items-center
-                        justify-center
-                        gap-3
-                        rounded-2xl
-                        bg-green-600
-                        text-[15px]
-                        font-semibold
-                        text-white
-                        shadow-sm
-                        transition
-                        hover:bg-green-700
-                      "
-                    >
-                      <LogIn
-                        className="h-5 w-5"
-                        strokeWidth={2}
-                      />
-
-                      <span>Login</span>
-                    </Link>
-                  </motion.div>
+   
 
                   {/* ================================================= */}
                   {/* CREATE ACCOUNT */}
                   {/* ================================================= */}
-
-                  <motion.div
+{
+  isPending ? (
+    <div className="w-9 h-9 rounded-full bg-white/10 animate-pulse" />
+)  : !user ? (
+  <>
+                    <motion.div
                     initial={{
                       opacity: 0,
                       y: 15,
@@ -499,80 +471,62 @@ const Navbar = () => {
                       <span>Create Account</span>
                     </Link>
                   </motion.div>
-
-                  {/* ================================================= */}
-                  {/* PROMOTIONAL CARD */}
-                  {/* ================================================= */}
-
-                  <motion.div
+  </>
+) : (
+  <>
+                    <motion.div
                     initial={{
                       opacity: 0,
-                      y: 20,
-                      scale: 0.97,
+                      y: 15,
                     }}
                     animate={{
                       opacity: 1,
                       y: 0,
-                      scale: 1,
                     }}
                     transition={{
-                      duration: 0.45,
-                      delay: 0.82,
-                      ease: [0.22, 1, 0.36, 1],
+                      duration: 0.35,
+                      delay: 0.76,
                     }}
-                    className="
-                      mt-8
-                      flex
-                      min-h-[96px]
-                      items-center
-                      gap-3
-                      rounded-xl
-                      bg-orange-50
-                      px-4
-                      py-4
-                    "
                   >
-                    {/* Gift */}
-
-                    <motion.div
-                      animate={{
-                        y: [0, -4, 0],
-                        rotate: [0, -3, 3, 0],
-                      }}
-                      transition={{
-                        duration: 2.5,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                      }}
-                      className="
-                        flex
-                        h-14
-                        w-14
-                        shrink-0
-                        items-center
-                        justify-center
-                      "
-                    >
-                      <Gift
-                        className="h-12 w-12 text-orange-500"
-                        strokeWidth={1.5}
-                      />
-                    </motion.div>
-
-                    {/* Text */}
-
-                    <div>
-                      <h3 className="text-[15px] font-bold text-red-700">
-                        Join ShopEasy
-                      </h3>
-
-                      <p className="mt-0.5 text-[12px] leading-5 text-red-800">
-                        Create an account to get
-                        <br />
-                        exclusive offers!
-                      </p>
-                    </div>
+<div
+  onClick={() => {
+    closeMobileMenu();
+    handleLogout();
+  }}
+  className="
+    mt-2
+    flex
+    h-[46px]
+    w-full
+    items-center
+    justify-center
+    gap-3
+    rounded-2xl
+    border
+    border-red-400
+    bg-white
+    text-[15px]
+    font-semibold
+    text-red-500
+    transition
+    hover:bg-red-50
+     cursor-pointer
+  "
+>
+  <LogOut size={17} strokeWidth={1.8} />
+  <span>Logout</span>
+</div>
                   </motion.div>
+  </>
+)}
+
+
+
+
+
+
+
+
                 </Drawer.Body>
               </Drawer.Dialog>
             </Drawer.Content>

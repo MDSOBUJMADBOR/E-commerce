@@ -1,8 +1,8 @@
+
 "use client";
 
 import { useState } from "react";
 import Link from "next/link";
-
 import {
   EnvelopeIcon,
   LockClosedIcon,
@@ -13,60 +13,230 @@ import {
   ArrowPathIcon,
 } from "@heroicons/react/24/outline";
 
+import { authClient } from "@/lib/auth-client";
+
 const RightSideSignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const [submitError, setSubmitError] = useState("");
 
   // ============================================
   // SIGN IN HANDLER
   // ============================================
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
 
-    const formData = new FormData(e.currentTarget);
+    setSubmitError("");
+    setIsSubmitting(true);
 
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
+    try {
+      const formData = new FormData(e.currentTarget);
 
-    // Save email for success screen
-    setUserEmail(email);
+      const email = (
+        formData.get("email") as string
+      ).trim();
 
-    // Console data
-    console.log("========== SIGN IN DATA ==========");
-    console.log("Email:", email);
-    console.log("Password:", password);
-    console.log("Remember Me:", rememberMe);
-    console.log("==================================");
+      const password =
+        formData.get("password") as string;
 
-    // Show success UI
-    setIsSuccess(true);
+      // Basic validation
+      if (!email) {
+        setSubmitError(
+          "Please enter your email address."
+        );
+        return;
+      }
+
+      if (!password) {
+        setSubmitError(
+          "Please enter your password."
+        );
+        return;
+      }
+
+      // Save email for success screen
+      setUserEmail(email);
+
+      // ============================================
+      // BETTER AUTH SIGN IN
+      // ============================================
+
+      const { data, error } =
+        await authClient.signIn.email({
+          email,
+          password,
+          rememberMe,
+          callbackURL: "/",
+        });
+
+      // ============================================
+      // HANDLE AUTH ERROR
+      // ============================================
+       if(data){
+        alert("Sign in successful! Redirecting to home page...");
+       }
+
+      if (error) {
+        console.error("Better Auth error:", error);
+
+        setSubmitError(
+          error.message ||
+            "Invalid email or password."
+        );
+
+        return;
+      }
+
+      // ============================================
+      // SUCCESS
+      // ============================================
+
+      console.log(
+        "Sign in successful:",
+        data
+      );
+
+      setIsSuccess(true);
+    } catch (error) {
+      console.error(
+        "Submission error:",
+        error
+      );
+
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // ============================================
-  // SOCIAL SIGN-IN HANDLERS
+  // GOOGLE SIGN-IN
   // ============================================
 
-  const googleSignIn = () => {
-    alert("Google Sign In clicked");
-  };
+  const googleSignIn = async () => {
+    setSubmitError("");
+    setIsSubmitting(true);
 
-  const facebookSignIn = () => {
-    alert("Facebook Sign In clicked");
-  };
+    try {
+      const { error } =
+        await authClient.signIn.social({
+          provider: "google",
+          callbackURL: "/",
+        });
 
-  const appleSignIn = () => {
-    alert("Apple Sign In clicked");
+      if (error) {
+        console.error(
+          "Google sign in error:",
+          error
+        );
+
+        setSubmitError(
+          error.message ||
+            "Google sign in failed."
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Google sign in error:",
+        error
+      );
+
+      setSubmitError(
+        "Unable to continue with Google."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // ============================================
-  // FORGOT PASSWORD
+  // FACEBOOK SIGN-IN
   // ============================================
 
-  const forgotPassword = () => {
-    alert("Forgot Password clicked");
+  const facebookSignIn = async () => {
+    setSubmitError("");
+    setIsSubmitting(true);
+
+    try {
+      const { error } =
+        await authClient.signIn.social({
+          provider: "facebook",
+          callbackURL: "/",
+        });
+
+      if (error) {
+        console.error(
+          "Facebook sign in error:",
+          error
+        );
+
+        setSubmitError(
+          error.message ||
+            "Facebook sign in failed."
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Facebook sign in error:",
+        error
+      );
+
+      setSubmitError(
+        "Unable to continue with Facebook."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // ============================================
+  // APPLE SIGN-IN
+  // ============================================
+
+  const appleSignIn = async () => {
+    setSubmitError("");
+    setIsSubmitting(true);
+
+    try {
+      const { error } =
+        await authClient.signIn.social({
+          provider: "apple",
+          callbackURL: "/",
+        });
+
+      if (error) {
+        console.error(
+          "Apple sign in error:",
+          error
+        );
+
+        setSubmitError(
+          error.message ||
+            "Apple sign in failed."
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Apple sign in error:",
+        error
+      );
+
+      setSubmitError(
+        "Unable to continue with Apple."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // ============================================
@@ -75,6 +245,7 @@ const RightSideSignIn = () => {
 
   const backToSignIn = () => {
     setIsSuccess(false);
+    setSubmitError("");
   };
 
   return (
@@ -89,6 +260,8 @@ const RightSideSignIn = () => {
       <div className="pointer-events-none absolute -bottom-20 -right-20 h-52 w-52 rounded-full border border-[#00a957]/10" />
 
       <div className="pointer-events-none absolute -bottom-8 -right-8 h-32 w-32 rounded-full border border-[#00a957]/10" />
+
+      <div className="pointer-events-none absolute -left-20 -top-20 h-44 w-44 rounded-full border border-[#00a957]/5" />
 
       {/* ============================================
           MAIN CONTENT
@@ -106,13 +279,7 @@ const RightSideSignIn = () => {
             onBack={backToSignIn}
           />
         ) : (
-
-          /* ============================================
-              SIGN IN FORM
-          ============================================ */
-
           <>
-
             {/* ============================================
                 LOCK ICON
             ============================================ */}
@@ -141,16 +308,26 @@ const RightSideSignIn = () => {
 
               <p className="mt-2 text-[13px] leading-5 text-[#68788c] sm:text-sm">
                 Glad to see you again. Please{" "}
-                <Link
-                  href="/signin"
-                  className="font-medium text-[#00a957] transition hover:text-[#008d49]"
-                >
+                <span className="font-medium text-[#00a957]">
                   sign in
-                </Link>{" "}
+                </span>{" "}
                 to continue.
               </p>
 
             </div>
+
+            {/* ============================================
+                ERROR MESSAGE
+            ============================================ */}
+
+            {submitError && (
+              <div
+                role="alert"
+                className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-center text-xs leading-5 text-red-600"
+              >
+                {submitError}
+              </div>
+            )}
 
             {/* ============================================
                 FORM
@@ -185,8 +362,10 @@ const RightSideSignIn = () => {
                     name="email"
                     type="email"
                     required
+                    autoComplete="email"
                     placeholder="Enter your email address"
-                    className="h-[46px] w-full rounded-[8px] border border-[#dfe4e8] bg-white pl-11 pr-4 text-[13px] text-[#26384d] outline-none transition placeholder:text-[#8b96a5] focus:border-[#00a957] focus:ring-2 focus:ring-[#00a957]/10"
+                    disabled={isSubmitting}
+                    className="h-[46px] w-full rounded-[8px] border border-[#dfe4e8] bg-white pl-11 pr-4 text-[13px] text-[#26384d] outline-none transition placeholder:text-[#8b96a5] focus:border-[#00a957] focus:ring-2 focus:ring-[#00a957]/10 disabled:cursor-not-allowed disabled:bg-gray-50"
                   />
 
                 </div>
@@ -215,33 +394,40 @@ const RightSideSignIn = () => {
                   <input
                     id="password"
                     name="password"
-                    type={showPassword ? "text" : "password"}
+                    type={
+                      showPassword
+                        ? "text"
+                        : "password"
+                    }
                     required
+                    autoComplete="current-password"
                     placeholder="Enter your password"
-                    className="h-[46px] w-full rounded-[8px] border border-[#dfe4e8] bg-white pl-11 pr-12 text-[13px] text-[#26384d] outline-none transition placeholder:text-[#8b96a5] focus:border-[#00a957] focus:ring-2 focus:ring-[#00a957]/10"
+                    disabled={isSubmitting}
+                    className="h-[46px] w-full rounded-[8px] border border-[#dfe4e8] bg-white pl-11 pr-12 text-[13px] text-[#26384d] outline-none transition placeholder:text-[#8b96a5] focus:border-[#00a957] focus:ring-2 focus:ring-[#00a957]/10 disabled:cursor-not-allowed disabled:bg-gray-50"
                   />
 
                   {/* Show / Hide Password */}
 
                   <button
                     type="button"
+                    disabled={isSubmitting}
                     onClick={() =>
-                      setShowPassword(!showPassword)
+                      setShowPassword(
+                        !showPassword
+                      )
                     }
                     aria-label={
                       showPassword
                         ? "Hide password"
                         : "Show password"
                     }
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#667386] transition hover:text-[#00a957]"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#667386] transition hover:text-[#00a957] disabled:cursor-not-allowed"
                   >
-
                     {showPassword ? (
                       <EyeSlashIcon className="h-[19px] w-[19px]" />
                     ) : (
                       <EyeIcon className="h-[19px] w-[19px]" />
                     )}
-
                   </button>
 
                 </div>
@@ -261,9 +447,12 @@ const RightSideSignIn = () => {
                     name="rememberMe"
                     checked={rememberMe}
                     onChange={(e) =>
-                      setRememberMe(e.target.checked)
+                      setRememberMe(
+                        e.target.checked
+                      )
                     }
-                    className="h-[17px] w-[17px] cursor-pointer accent-[#00a957]"
+                    disabled={isSubmitting}
+                    className="h-[17px] w-[17px] cursor-pointer accent-[#00a957] disabled:cursor-not-allowed"
                   />
 
                   <span>
@@ -273,8 +462,7 @@ const RightSideSignIn = () => {
                 </label>
 
                 <Link
-                  href="/signin"
-                  onClick={forgotPassword}
+                  href="/forgot-password"
                   className="text-[13px] font-semibold text-[#00a957] transition hover:text-[#008d49]"
                 >
                   Forgot Password?
@@ -288,14 +476,27 @@ const RightSideSignIn = () => {
 
               <button
                 type="submit"
-                className="mt-1 flex h-[43px] w-full items-center justify-center gap-2 rounded-[7px] bg-[#00a957] text-[14px] font-semibold text-white shadow-sm transition duration-200 hover:bg-[#00984e] hover:shadow-md active:scale-[0.99]"
+                disabled={isSubmitting}
+                className="mt-1 flex h-[43px] w-full items-center justify-center gap-2 rounded-[7px] bg-[#00a957] text-[14px] font-semibold text-white shadow-sm transition duration-200 hover:bg-[#00984e] hover:shadow-md active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
               >
 
-                <UserPlusIcon className="h-[19px] w-[19px]" />
+                {isSubmitting ? (
+                  <>
+                    <span className="h-[18px] w-[18px] animate-spin rounded-full border-2 border-white/30 border-t-white" />
 
-                <span>
-                  Sign In
-                </span>
+                    <span>
+                      Signing In...
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <UserPlusIcon className="h-[19px] w-[19px]" />
+
+                    <span>
+                      Sign In
+                    </span>
+                  </>
+                )}
 
               </button>
 
@@ -327,18 +528,21 @@ const RightSideSignIn = () => {
                 provider="Google"
                 icon={<GoogleIcon />}
                 onClick={googleSignIn}
+                disabled={isSubmitting}
               />
 
               <SocialButton
                 provider="Facebook"
                 icon={<FacebookIcon />}
                 onClick={facebookSignIn}
+                disabled={isSubmitting}
               />
 
               <SocialButton
                 provider="Apple"
                 icon={<AppleIcon />}
                 onClick={appleSignIn}
+                disabled={isSubmitting}
               />
 
             </div>
@@ -392,9 +596,11 @@ function SuccessScreen({
       <div className="relative mb-6 flex h-[105px] w-[105px] items-center justify-center">
 
         {/* Outer Pulse */}
+
         <div className="absolute inset-0 animate-ping rounded-full bg-[#00a957]/10" />
 
         {/* Circle */}
+
         <div className="relative flex h-[92px] w-[92px] animate-[successScale_0.5s_ease-out] items-center justify-center rounded-full bg-[#eff9f3]">
 
           <div className="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-[#00a957] shadow-lg shadow-[#00a957]/20">
@@ -405,6 +611,7 @@ function SuccessScreen({
               viewBox="0 0 52 52"
               className="h-9 w-9"
               fill="none"
+              aria-hidden="true"
             >
 
               <path
@@ -609,16 +816,19 @@ function SocialButton({
   provider,
   icon,
   onClick,
+  disabled,
 }: {
   provider: string;
   icon: React.ReactNode;
   onClick: () => void;
+  disabled?: boolean;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="flex h-[45px] items-center justify-center gap-2 rounded-[8px] border border-[#dfe4e8] bg-white px-2 text-[13px] font-semibold text-[#26384d] transition duration-200 hover:border-[#cbd2d9] hover:bg-[#fafafa] hover:shadow-sm active:scale-[0.98] sm:gap-2.5"
+      disabled={disabled}
+      className="flex h-[45px] items-center justify-center gap-2 rounded-[8px] border border-[#dfe4e8] bg-white px-2 text-[13px] font-semibold text-[#26384d] transition duration-200 hover:border-[#cbd2d9] hover:bg-[#fafafa] hover:shadow-sm active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 sm:gap-2.5"
     >
 
       <span className="flex h-5 w-5 shrink-0 items-center justify-center">
@@ -709,3 +919,4 @@ function AppleIcon() {
     </svg>
   );
 }
+
