@@ -12,13 +12,14 @@ import {
   Package,
   Settings,
   LogOut,
-} from "lucide-react";
+} from "lucide-react"; 
 
 
 
 
 
 export default function RightSide() {
+  
 
    const [profileOpen, setProfileOpen] = useState(false);
     const profileRef = useRef<HTMLDivElement>(null);

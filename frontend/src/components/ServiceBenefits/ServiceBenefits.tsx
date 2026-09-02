@@ -12,6 +12,7 @@ interface Benefit {
   icon: React.ElementType;
 }
 
+
 const benefits: Benefit[] = [
   {
     title: "Free Shipping",
