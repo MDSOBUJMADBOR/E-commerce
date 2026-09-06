@@ -3,7 +3,15 @@ import dotenv from "dotenv";
 
 dotenv.config({ path: ".env" });
 
-console.log("MONGODB_URI:", process.env.MONGODB_URI ? "FOUND ✅" : "NOT FOUND ❌");
+console.log(
+  "MONGODB_URI:",
+  process.env.MONGODB_URI ? "FOUND ✅" : "NOT FOUND ❌"
+);
+
+console.log(
+  "DB_NAME:",
+  process.env.DB_NAME ? process.env.DB_NAME : "NOT FOUND ❌"
+);
 
 const uri = process.env.MONGODB_URI;
 
@@ -19,7 +27,11 @@ const connectDB = async () => {
 
     console.log("MongoDB connected successfully ✅");
 
-    return client.db(process.env.DB_NAME || "ecommerceDB");
+    const db = client.db(process.env.DB_NAME || "E-commerce");
+
+    console.log(`Database connected: ${db.databaseName} ✅`);
+
+    return db;
   } catch (error) {
     console.error("MongoDB connection failed ❌", error);
     process.exit(1);

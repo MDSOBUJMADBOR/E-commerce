@@ -34,6 +34,7 @@ const slides: Slide[] = [
     buttonLink: "/shop",
   },
 
+  
   {
     id: 2,
     image: "/images/hero/hero-2.png",

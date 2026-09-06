@@ -1,3 +1,4 @@
+import FeaturedProduct from "@/components/Featured-Product/Featured-Product"
 import HeroSectionPage from "@/components/Hero-Section/Hero-Section"
 import NewsletterSection from "@/components/HomePageUi/NewsletterSection"
 import OurTopBrands from "@/components/OurTopBrands/OurTopBrands"
@@ -9,6 +10,7 @@ const Home = () => {
     <div>
       <HeroSectionPage />
       <ShopByCategory />
+      <FeaturedProduct />
       <ServiceBenefits />
       <OurTopBrands />
       <NewsletterSection />

@@ -12,6 +12,7 @@ export default function LeftSide() {
           height={50}
           priority
         />
+        
 
         <h2 className="italic text-2xl lg:text-3xl  xl:text-4xl font-bold  text-green-600 ">
          ‍<span className="text-black">Shop</span>Easy

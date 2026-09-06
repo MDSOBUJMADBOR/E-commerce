@@ -12,20 +12,21 @@ import {
   Package,
   Settings,
   LogOut,
-} from "lucide-react";
+} from "lucide-react"; 
 
 
 
 
 
 export default function RightSide() {
+  
 
    const [profileOpen, setProfileOpen] = useState(false);
     const profileRef = useRef<HTMLDivElement>(null);
 
  const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
-  console.log(user,'usernavbar');
+ 
 
 
 const pathname = usePathname();
