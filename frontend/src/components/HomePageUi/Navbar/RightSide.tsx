@@ -26,7 +26,7 @@ export default function RightSide() {
 
  const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
-  console.log(user,'usernavbar');
+ 
 
 
 const pathname = usePathname();
