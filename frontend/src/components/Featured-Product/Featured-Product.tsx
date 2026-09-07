@@ -154,7 +154,7 @@ const FeaturedProduct = () => {
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
 
-          {products.slice(0, 6).map((product) => {
+          {products.map((product) => {
 
             const productImage =
               product.image ||

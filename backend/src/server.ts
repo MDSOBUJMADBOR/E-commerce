@@ -29,7 +29,7 @@ const startServer = async () => {
     const usersCollection = db.collection("user");
     const productsCollection = db.collection("Product-data");
     const cartCollection = db.collection("cart");
-
+const wishlistCollection = db.collection("wishlist");
 
 
 
@@ -188,21 +188,24 @@ app.post("/cart", async (req,res) => {
     // GET /products
     // ====================
 
-    app.get("/products", async (req, res) => {
-      try {
-        const products = await productsCollection.find({}).toArray();
+app.get("/products", async (req, res) => {
+  try {
+    const products = await productsCollection
+      .find({})
+      .limit(6)
+      .toArray();
 
-        res.status(200).json({
-          success: true,
-          data: products,
-        });
-      } catch (error) {
-        res.status(500).json({
-          success: false,
-          message: "Failed to get products",
-        });
-      }
+    res.status(200).json({
+      success: true,
+      data: products,
     });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to get products",
+    });
+  }
+});
 
     // ====================
     // GET SINGLE PRODUCT
@@ -259,6 +262,88 @@ app.post("/cart", async (req,res) => {
         });
       }
     });
+
+
+// ====================
+// ADD TO WISHLIST
+// POST /wishlist
+// একই email একই product একবারই add করতে পারবে
+// ====================
+
+app.post("/wishlist", async (req, res) => {
+  try {
+    const wishlistData = req.body;
+
+    const { productId, userEmail } = wishlistData;
+
+    // ====================
+    // VALIDATION
+    // ====================
+
+    if (!productId) {
+      return res.status(400).json({
+        success: false,
+        message: "Product ID is required",
+      });
+    }
+
+    if (!userEmail) {
+      return res.status(401).json({
+        success: false,
+        message: "Please login first to add wishlist",
+      });
+    }
+
+    // ====================
+    // CHECK DUPLICATE
+    // একই email + একই product
+    // ====================
+
+    const alreadyExists = await wishlistCollection.findOne({
+      productId: productId,
+      userEmail: userEmail,
+    });
+
+    if (alreadyExists) {
+      return res.status(409).json({
+        success: false,
+        message: "This product is already in your wishlist",
+      });
+    }
+
+    // ====================
+    // ADD CREATED DATE
+    // ====================
+
+    wishlistData.createdAt = new Date();
+
+    // ====================
+    // INSERT DATABASE
+    // ====================
+
+    const result = await wishlistCollection.insertOne(
+      wishlistData
+    );
+
+    return res.status(201).json({
+      success: true,
+      message: "Product added to wishlist successfully",
+      insertedId: result.insertedId,
+    });
+
+  } catch (error) {
+    console.error("Wishlist Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to add product to wishlist",
+    });
+  }
+});
+
+
+
+
 
     // ====================
     // START SERVER
