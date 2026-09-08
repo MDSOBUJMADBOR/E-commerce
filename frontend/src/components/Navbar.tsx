@@ -1,7 +1,7 @@
 "use client";
 
 import { Avatar, Button, Drawer } from "@heroui/react";
-import { useState } from "react";
+import {  useEffect, useState } from "react";
 
 import {
   X,
@@ -29,14 +29,26 @@ import Middle from "./HomePageUi/Navbar/Middle";
 import LeftSide from "./HomePageUi/Navbar/LeftSide";
 import { authClient } from "@/lib/auth-client";
 
+interface CartItem {
+  _id: string;
+  quantity: number;
+}
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
+
   const pathname = usePathname();
 
-  // ================= MENU ITEMS =================
+  const { data: session, isPending } = authClient.useSession();
+  const user = session?.user;
+   const userEmail = user?.email;
 
-  const menuItems = [ 
+  // ==========================================
+  // MENU ITEMS
+  // ==========================================
+
+  const menuItems = [
     {
       name: "Home",
       icon: Home,
@@ -74,56 +86,135 @@ const Navbar = () => {
     },
   ];
 
-  // ================= CLOSE DRAWER =================
+  // ==========================================
+  // CLOSE MOBILE MENU
+  // ==========================================
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
   };
 
+  // ==========================================
+  // FETCH CART COUNT
+  // ==========================================
 
-  const { data: session, isPending } = authClient.useSession();
-  const user = session?.user;
- 
+const fetchCartCount = async (email?: string) => {
+  if (!email) {
+    return 0;
+  }
 
-   const handleLogout = async () => {
-      await authClient.signOut();
-      
-     
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/cart/email/${email}`,
+      {
+        cache: "no-store",
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch cart count");
     }
 
+    const data: CartItem[] = await response.json();
+
+    return data.reduce(
+      (total, item) =>
+        total + (item.quantity || 0),
+      0
+    );
+  } catch (error) {
+    console.error("Cart count error:", error);
+
+    return 0;
+  }
+};
+
+  // ==========================================
+  // CART COUNT EFFECT
+  // ==========================================
+
+useEffect(() => {
+  let ignore = false;
+
+  const loadCartCount = async () => {
+    const count = await fetchCartCount(userEmail);
+
+    if (!ignore) {
+      setCartCount(count);
+    }
+  };
+
+  // Event listener
+  const handleCartUpdated = async () => {
+    const count = await fetchCartCount(userEmail);
+
+    if (!ignore) {
+      setCartCount(count);
+    }
+  };
+
+  window.addEventListener(
+    "cartUpdated",
+    handleCartUpdated
+  );
+
+  // প্রথমবার cart load
+  void loadCartCount();
+
+  return () => {
+    ignore = true;
+
+    window.removeEventListener(
+      "cartUpdated",
+      handleCartUpdated
+    );
+  };
+}, [userEmail]);
+
+  // ==========================================
+  // LOGOUT
+  // ==========================================
+
+  const handleLogout = async () => {
+    await authClient.signOut();
+
+    setCartCount(0);
+
+    // অন্য component-কে জানানো
+    window.dispatchEvent(new Event("cartUpdated"));
+  };
+
+  // ==========================================
+  // RETURN
+  // ==========================================
 
   return (
-    <header className="sticky top-0 z-50  bg-gray-50">
-      {/* ================================================= */}
+    <header className="sticky top-0 z-50 bg-gray-50">
+      {/* ================================= */}
       {/* DESKTOP NAVBAR */}
-      {/* ================================================= */}
+      {/* ================================= */}
 
-      <nav className="container  mx-auto hidden items-center justify-between gap-2 px-5 py-4 lg:flex ">
-        {/* Left */}
+      <nav className="container mx-auto hidden items-center justify-between gap-2 px-5 py-4 lg:flex">
         <LeftSide />
 
-        {/* Middle */}
         <Middle />
 
-        {/* Right */}
-        <RightSide />
+        <RightSide cartCount={cartCount} />
       </nav>
 
-      {/* ================================================= */}
+      {/* ================================= */}
       {/* MOBILE NAVBAR */}
-      {/* ================================================= */}
+      {/* ================================= */}
 
       <div className="block px-4 py-4 lg:hidden">
-        {/* ================================================= */}
-        {/* MOBILE TOP HEADER */}
-        {/* ================================================= */}
+        {/* ================================= */}
+        {/* MOBILE TOP */}
+        {/* ================================= */}
 
         <div className="flex items-center justify-between">
-          {/* ================= LEFT SIDE ================= */}
+          {/* MENU BUTTON */}
 
           <div className="flex items-center gap-2">
-            {/* Menu Button */}
-
             <Button
               isIconOnly
               variant="ghost"
@@ -133,42 +224,33 @@ const Navbar = () => {
               }
               className="rounded-full p-1 text-gray-900"
             >
-             
-                {isMobileMenuOpen ? (
-                  
-                    <X
-                      className="h-7 w-7"
-                      strokeWidth={2}
-                    />
-                  
-                ) : (
-                  
-               
-                    <Menu
-                      className="h-7 w-7"
-                      strokeWidth={2}
-                    />
-                  
-                )}
-             
+              {isMobileMenuOpen ? (
+                <X
+                  className="h-7 w-7"
+                  strokeWidth={2}
+                />
+              ) : (
+                <Menu
+                  className="h-7 w-7"
+                  strokeWidth={2}
+                />
+              )}
             </Button>
           </div>
 
-          {/* ================= RIGHT SIDE ================= */}
+          {/* ================================= */}
+          {/* MOBILE RIGHT SIDE */}
+          {/* ================================= */}
 
           <div className="flex items-center gap-2">
-            {/* ================= WISHLIST ================= */}
+            {/* WISHLIST */}
 
             <Link
               href="/wishlist"
               className="group relative flex items-center text-gray-800 transition hover:text-green-600"
             >
               <div className="relative">
-                <Heart
-                  className="h-7 w-7 stroke-[1.8] transition group-hover:fill-green-50"
-                />
-
-                {/* Wishlist Badge */}
+                <Heart className="h-7 w-7 stroke-[1.8] transition group-hover:fill-green-50" />
 
                 <span className="absolute -right-2 -top-3 flex h-5 min-w-5 items-center justify-center rounded-full bg-green-600 px-1 text-[11px] font-bold text-white">
                   3
@@ -176,7 +258,9 @@ const Navbar = () => {
               </div>
             </Link>
 
-            {/* ================= CART ================= */}
+            {/* ================================= */}
+            {/* CART */}
+            {/* ================================= */}
 
             <Link href="/cart">
               <button
@@ -189,40 +273,42 @@ const Navbar = () => {
                   strokeWidth={2}
                 />
 
-                {/* Cart Badge */}
-
-                <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-green-600 px-1 text-xs font-semibold text-white">
-                  3
-                </span>
+                {cartCount > 0 && (
+                  <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-green-600 px-1 text-xs font-semibold text-white">
+                    {cartCount > 99 ? "99+" : cartCount}
+                  </span>
+                )}
               </button>
             </Link>
 
-            {/* ================= AVATAR ================= */}
+            {/* ================================= */}
+            {/* AVATAR */}
+            {/* ================================= */}
 
             <Avatar>
               <Avatar.Image
-                alt="John Doe"
+                alt={user?.name || "User"}
                 src="https://img.heroui.chat/image/avatar?w=400&h=400&u=3"
               />
 
               <Avatar.Fallback>
-                JD
+                {user?.name?.charAt(0) || "U"}
               </Avatar.Fallback>
             </Avatar>
           </div>
         </div>
 
-        {/* ================================================= */}
+        {/* ================================= */}
         {/* SEARCH */}
-        {/* ================================================= */}
+        {/* ================================= */}
 
         <div className="mt-5">
           <Middle />
         </div>
 
-        {/* ================================================= */}
+        {/* ================================= */}
         {/* MOBILE DRAWER */}
-        {/* ================================================= */}
+        {/* ================================= */}
 
         <Drawer
           isOpen={isMobileMenuOpen}
@@ -234,13 +320,13 @@ const Navbar = () => {
               className="max-w-full bg-white"
             >
               <Drawer.Dialog className="h-full">
-                {/* ================================================= */}
+                {/* ================================= */}
                 {/* DRAWER HEADER */}
-                {/* ================================================= */}
+                {/* ================================= */}
 
                 <motion.div
                   initial={{
-                    opacity: 0, 
+                    opacity: 0,
                     x: -20,
                   }}
                   animate={{
@@ -253,33 +339,20 @@ const Navbar = () => {
                     ease: [0.22, 1, 0.36, 1],
                   }}
                 >
-                  <Drawer.Header
-                    className="
-                      flex
-                      flex-row
-                      justify-between
-                      border-b-0
-                      px-1
-                      pb-2
-                    "
-                  >
-                    {/* ================= LOGO ================= */}
+                  <Drawer.Header className="flex flex-row justify-between border-b-0 px-1 pb-2">
+                    {/* LOGO */}
 
                     <Link
                       href="/"
                       onClick={closeMobileMenu}
                       className="flex items-center"
                     >
-                      {/* Logo Icon */}
-
                       <Image
                         src="/images/icons.png"
                         alt="ShopEasy"
                         width={50}
                         height={50}
                       />
-
-                      {/* Logo Text */}
 
                       <span className="text-2xl font-bold italic text-green-600">
                         <span className="text-black">
@@ -289,24 +362,13 @@ const Navbar = () => {
                       </span>
                     </Link>
 
-                    {/* ================= CLOSE BUTTON ================= */}
+                    {/* CLOSE */}
 
                     <button
                       type="button"
                       aria-label="Close menu"
                       onClick={closeMobileMenu}
-                      className="
-                        mt-3
-                        flex
-                        h-9
-                        w-9
-                        items-center
-                        justify-center
-                        rounded-full
-                        text-gray-900
-                        transition
-                        hover:bg-gray-100
-                      "
+                      className="mt-3 flex h-9 w-9 items-center justify-center rounded-full text-gray-900 transition hover:bg-gray-100"
                     >
                       <X
                         className="h-6 w-6"
@@ -316,14 +378,12 @@ const Navbar = () => {
                   </Drawer.Header>
                 </motion.div>
 
-                {/* ================================================= */}
+                {/* ================================= */}
                 {/* DRAWER BODY */}
-                {/* ================================================= */}
+                {/* ================================= */}
 
                 <Drawer.Body className="px-4 pb-6 pt-4">
-                  {/* ================================================= */}
-                  {/* MENU ITEMS */}
-                  {/* ================================================= */}
+                  {/* MENU */}
 
                   <nav className="flex flex-col gap-1">
                     {menuItems.map((item, index) => {
@@ -347,8 +407,14 @@ const Navbar = () => {
                           }}
                           transition={{
                             duration: 0.35,
-                            delay: 0.2 + index * 0.055,
-                            ease: [0.22, 1, 0.36, 1],
+                            delay:
+                              0.2 + index * 0.055,
+                            ease: [
+                              0.22,
+                              1,
+                              0.36,
+                              1,
+                            ],
                           }}
                         >
                           <Link
@@ -360,8 +426,6 @@ const Navbar = () => {
                                 : "text-gray-900 hover:bg-gray-50"
                             }`}
                           >
-                            {/* Left */}
-
                             <div className="flex items-center gap-4">
                               <Icon
                                 className={`h-[21px] w-[21px] ${
@@ -383,8 +447,6 @@ const Navbar = () => {
                               </span>
                             </div>
 
-                            {/* Right Arrow */}
-
                             {!isActive && (
                               <ChevronRight
                                 className="h-5 w-5 text-gray-500 transition-transform duration-200 group-hover:translate-x-1"
@@ -397,9 +459,7 @@ const Navbar = () => {
                     })}
                   </nav>
 
-                  {/* ================================================= */}
                   {/* DIVIDER */}
-                  {/* ================================================= */}
 
                   <motion.div
                     initial={{
@@ -417,116 +477,72 @@ const Navbar = () => {
                     className="my-5 h-px w-full origin-left bg-gray-200"
                   />
 
-   
+                  {/* ================================= */}
+                  {/* LOGIN / LOGOUT */}
+                  {/* ================================= */}
 
-                  {/* ================================================= */}
-                  {/* CREATE ACCOUNT */}
-                  {/* ================================================= */}
-{
-  isPending ? (
-    <div className="w-9 h-9 rounded-full bg-white/10 animate-pulse" />
-)  : !user ? (
-  <>
+                  {isPending ? (
+                    <div className="h-9 w-9 animate-pulse rounded-full bg-gray-200" />
+                  ) : !user ? (
                     <motion.div
-                    initial={{
-                      opacity: 0,
-                      y: 15,
-                    }}
-                    animate={{
-                      opacity: 1,
-                      y: 0,
-                    }}
-                    transition={{
-                      duration: 0.35,
-                      delay: 0.76,
-                    }}
-                  >
-                    <Link
-                      href="/signup"
-                      onClick={closeMobileMenu}
-                      className="
-                        mt-2
-                        flex
-                        h-[46px]
-                        w-full
-                        items-center
-                        justify-center
-                        gap-3
-                        rounded-2xl
-                        border
-                        border-gray-400
-                        bg-white
-                        text-[15px]
-                        font-semibold
-                        text-gray-900
-                        transition
-                        hover:bg-gray-50
-                      "
+                      initial={{
+                        opacity: 0,
+                        y: 15,
+                      }}
+                      animate={{
+                        opacity: 1,
+                        y: 0,
+                      }}
+                      transition={{
+                        duration: 0.35,
+                        delay: 0.76,
+                      }}
                     >
-                      <UserPlus
-                        className="h-5 w-5"
-                        strokeWidth={2}
-                      />
+                      <Link
+                        href="/signup"
+                        onClick={closeMobileMenu}
+                        className="mt-2 flex h-[46px] w-full items-center justify-center gap-3 rounded-2xl border border-gray-400 bg-white text-[15px] font-semibold text-gray-900 transition hover:bg-gray-50"
+                      >
+                        <UserPlus
+                          className="h-5 w-5"
+                          strokeWidth={2}
+                        />
 
-                      <span>Create Account</span>
-                    </Link>
-                  </motion.div>
-  </>
-) : (
-  <>
+                        <span>Create Account</span>
+                      </Link>
+                    </motion.div>
+                  ) : (
                     <motion.div
-                    initial={{
-                      opacity: 0,
-                      y: 15,
-                    }}
-                    animate={{
-                      opacity: 1,
-                      y: 0,
-                    }}
-                    transition={{
-                      duration: 0.35,
-                      delay: 0.76,
-                    }}
-                  >
-<div
-  onClick={() => {
-    closeMobileMenu();
-    handleLogout();
-  }}
-  className="
-    mt-2
-    flex
-    h-[46px]
-    w-full
-    items-center
-    justify-center
-    gap-3
-    rounded-2xl
-    border
-    border-red-400
-    bg-white
-    text-[15px]
-    font-semibold
-    text-red-500
-    transition
-    hover:bg-red-50
-     cursor-pointer
-  "
->
-  <LogOut size={17} strokeWidth={1.8} />
-  <span>Logout</span>
-</div>
-                  </motion.div>
-  </>
-)}
+                      initial={{
+                        opacity: 0,
+                        y: 15,
+                      }}
+                      animate={{
+                        opacity: 1,
+                        y: 0,
+                      }}
+                      transition={{
+                        duration: 0.35,
+                        delay: 0.76,
+                      }}
+                    >
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          closeMobileMenu();
+                          await handleLogout();
+                        }}
+                        className="mt-2 flex h-[46px] w-full items-center justify-center gap-3 rounded-2xl border border-red-400 bg-white text-[15px] font-semibold text-red-500 transition hover:bg-red-50"
+                      >
+                        <LogOut
+                          size={17}
+                          strokeWidth={1.8}
+                        />
 
-
-
-
-
-
-
-
+                        <span>Logout</span>
+                      </button>
+                    </motion.div>
+                  )}
                 </Drawer.Body>
               </Drawer.Dialog>
             </Drawer.Content>
