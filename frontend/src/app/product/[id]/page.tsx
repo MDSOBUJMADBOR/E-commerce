@@ -16,7 +16,7 @@ import {
 
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { useParams, useRouter } from "next/navigation";
+import { redirect, useParams, useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 
 // =========================
@@ -212,7 +212,7 @@ export default function ProductDetailsPage() {
       toast.warning(
         "Please login first to add product to cart!"
       );
-
+redirect("/signin");
       return;
     }
 
@@ -313,7 +313,7 @@ export default function ProductDetailsPage() {
       toast.warning(
         "Please login first to add product to wishlist!"
       );
-
+redirect("/signin");
       return;
     }
 

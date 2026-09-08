@@ -44,6 +44,23 @@ app.post("/cart", async (req,res) => {
   res.send(result);
 })
 
+app.get("/cart/email/:email", async (req,res) => {
+try {
+  const { email } = req.params;
+  const result = await cartCollection.find({ userEmail: email }).toArray();
+  res.status(200).json(result);
+
+}
+catch (error) {
+  console.error(error);
+  res.status(500).json({
+    success: false,
+    message: "Internal Server Error",
+  });
+}
+});
+// http://localhost:5000/cart/email/sobujmadbor660@gmail.com
+
 
 
 
@@ -69,119 +86,7 @@ app.post("/cart", async (req,res) => {
       }
     });
 
-    // ====================
-    // GET SINGLE USER
-    // GET /users/:id
-    // ====================
-
-    app.get("/users/:id", async (req, res) => {
-      try {
-        const id = req.params.id;
-
-        const user = await usersCollection.findOne({
-          _id: new ObjectId(id),
-        });
-
-        if (!user) {
-          return res.status(404).json({
-            success: false,
-            message: "User not found",
-          });
-        }
-
-        res.status(200).json({
-          success: true,
-          data: user,
-        });
-      } catch (error) {
-        res.status(500).json({
-          success: false,
-          message: "Failed to get user",
-        });
-      }
-    });
-
-    // ====================
-    // CREATE USER
-    // POST /users
-    // ====================
-
-    app.post("/users", async (req, res) => {
-      try {
-        const user = req.body;
-
-        const result = await usersCollection.insertOne(user);
-
-        res.status(201).json({
-          success: true,
-          message: "User created successfully",
-          insertedId: result.insertedId,
-        });
-      } catch (error) {
-        res.status(500).json({
-          success: false,
-          message: "Failed to create user",
-        });
-      }
-    });
-
-    // ====================
-    // UPDATE USER
-    // PUT /users/:id
-    // ====================
-
-    app.put("/users/:id", async (req, res) => {
-      try {
-        const id = req.params.id;
-        const updatedUser = req.body;
-
-        const result = await usersCollection.updateOne(
-          {
-            _id: new ObjectId(id),
-          },
-          {
-            $set: updatedUser,
-          }
-        );
-
-        res.status(200).json({
-          success: true,
-          message: "User updated successfully",
-          modifiedCount: result.modifiedCount,
-        });
-      } catch (error) {
-        res.status(500).json({
-          success: false,
-          message: "Failed to update user",
-        });
-      }
-    });
-
-    // ====================
-    // DELETE USER
-    // DELETE /users/:id
-    // ====================
-
-    app.delete("/users/:id", async (req, res) => {
-      try {
-        const id = req.params.id;
-
-        const result = await usersCollection.deleteOne({
-          _id: new ObjectId(id),
-        });
-
-        res.status(200).json({
-          success: true,
-          message: "User deleted successfully",
-          deletedCount: result.deletedCount,
-        });
-      } catch (error) {
-        res.status(500).json({
-          success: false,
-          message: "Failed to delete user",
-        });
-      }
-    });
+    
 
     // ====================
     // GET ALL PRODUCTS
@@ -239,29 +144,6 @@ app.get("/products", async (req, res) => {
       }
     });
 
-    // ====================
-    // CREATE PRODUCT
-    // POST /products
-    // ====================
-
-    app.post("/products", async (req, res) => {
-      try {
-        const product = req.body;
-
-        const result = await productsCollection.insertOne(product);
-
-        res.status(201).json({
-          success: true,
-          message: "Product created successfully",
-          insertedId: result.insertedId,
-        });
-      } catch (error) {
-        res.status(500).json({
-          success: false,
-          message: "Failed to create product",
-        });
-      }
-    });
 
 
 // ====================
