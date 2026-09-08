@@ -24,8 +24,7 @@ import { authClient } from "@/lib/auth-client";
 // =========================
 
 const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "http://localhost:5000";
+  process.env.NEXT_PUBLIC_API_URL;
 
 // =========================
 // TYPES
@@ -207,102 +206,106 @@ export default function ProductDetailsPage() {
   // ADD TO CART
   // =========================
 
-  const handleAddToCart = async () => {
-    if (!user?.email) {
-      toast.warning(
-        "Please login first to add product to cart!"
-      );
-redirect("/signin");
-      return;
-    }
+const handleAddToCart = async () => {
+  if (!user?.email) {
+    toast.warning(
+      "Please login first to add product to cart!"
+    );
 
-    if (!product) return;
+    router.push("/signin");
+    return;
+  }
 
-    if (
-      product.stock !== undefined &&
-      product.stock <= 0
-    ) {
+  if (!product) return;
+
+  if (
+    product.stock !== undefined &&
+    product.stock <= 0
+  ) {
+    toast.error("This product is out of stock!");
+    return;
+  }
+
+  try {
+    setAdding(true);
+
+    const cartData = {
+      productId: product._id,
+
+      name: product.name,
+      brand: product.brand,
+      category: product.category,
+      subcategory: product.subcategory,
+      type: product.type,
+
+      price: product.price,
+      oldPrice: product.oldPrice,
+      discount: product.discount,
+      currency: product.currency,
+
+      image: selectedImage,
+
+      rating: product.rating,
+      reviews: product.reviews,
+
+      stock: product.stock,
+
+      color: selectedColor,
+
+      quantity,
+
+      userName: user.name,
+      userEmail: user.email,
+    };
+
+    const res = await fetch(`${API_URL}/cart`, {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify(cartData),
+    });
+
+    const result = await res.json();
+
+    if (!res.ok) {
       toast.error(
-        "This product is out of stock!"
-      );
-
-      return;
-    }
-
-    try {
-      setAdding(true);
-
-      const cartData = {
-        productId: product._id,
-
-        name: product.name,
-        brand: product.brand,
-        category: product.category,
-        subcategory: product.subcategory,
-        type: product.type,
-
-        price: product.price,
-        oldPrice: product.oldPrice,
-        discount: product.discount,
-        currency: product.currency,
-
-        image: selectedImage,
-
-        rating: product.rating,
-        reviews: product.reviews,
-
-        stock: product.stock,
-
-        color: selectedColor,
-
-        quantity,
-
-        userName: user.name,
-        userEmail: user.email,
-      };
-
-      const res = await fetch(
-        `${API_URL}/cart`,
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-
-          body: JSON.stringify(cartData),
-        }
-      );
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        toast.error(
-          result.message ||
-            "Failed to add product to cart!"
-        );
-
-        return;
-      }
-
-      toast.success(
         result.message ||
-          "Product added to cart successfully!"
-      );
-    } catch (error) {
-      console.error(
-        "Cart Error:",
-        error
+          "Failed to add product to cart!"
       );
 
-      toast.error(
-        "Failed to add product to cart!"
-      );
-    } finally {
-      setAdding(false);
+      return;
     }
-  };
+
+    // ======================================
+    // CART UPDATED EVENT
+    // Navbar এই event শুনবে
+    // ======================================
+
+    window.dispatchEvent(
+      new CustomEvent("cartUpdated", {
+        detail: {
+          email: user.email,
+        },
+      })
+    );
+
+    toast.success(
+      result.message ||
+        "Product added to cart successfully!"
+    );
+  } catch (error) {
+    console.error("Cart Error:", error);
+
+    toast.error(
+      "Failed to add product to cart!"
+    );
+  } finally {
+    setAdding(false);
+  }
+};
 
   // =========================
   // ADD TO WISHLIST

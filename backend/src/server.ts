@@ -44,22 +44,93 @@ app.post("/cart", async (req,res) => {
   res.send(result);
 })
 
-app.get("/cart/email/:email", async (req,res) => {
-try {
-  const { email } = req.params;
-  const result = await cartCollection.find({ userEmail: email }).toArray();
-  res.status(200).json(result);
+app.get("/cart/email/:email", async (req, res) => {
+  try {
+    const { email } = req.params;
 
-}
-catch (error) {
-  console.error(error);
-  res.status(500).json({
-    success: false,
-    message: "Internal Server Error",
-  });
-}
+    const result = await cartCollection
+      .find({ userEmail: email })
+      .toArray();
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
 });
-// http://localhost:5000/cart/email/sobujmadbor660@gmail.com
+
+app.patch("/cart/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { quantity } = req.body;
+
+    if (!quantity || quantity < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Quantity must be at least 1",
+      });
+    }
+
+    const result = await cartCollection.updateOne(
+      {
+        _id: new ObjectId(id),
+      },
+      {
+        $set: {
+          quantity: Number(quantity),
+        },
+      }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Cart quantity updated",
+      result,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+});
+
+
+app.delete("/cart/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await cartCollection.deleteOne({
+      _id: new ObjectId(id),
+    });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Cart item not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Cart item deleted successfully",
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+});
+
 
 
 
