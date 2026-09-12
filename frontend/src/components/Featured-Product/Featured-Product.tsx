@@ -34,6 +34,7 @@ const FeaturedProduct = () => {
 
   // ================= FETCH PRODUCTS =================
 
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -61,8 +62,8 @@ const FeaturedProduct = () => {
 
   const handleAddToCart = async (product: Product) => {
     if (!user) {
-      toast.warning("Please login first!");
-      router.push("/login");
+      toast.warning("Please signin first!");
+      router.push("/signin");
       return;
     }
 
